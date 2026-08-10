@@ -47,6 +47,8 @@ Content-Type: multipart/form-data
 
 Accepts one OpenSky JSON trajectory file in the `File` form field and delegates processing to `ImportFlightTrajectoryService`. A new import returns `201 Created` with the import result and a `Location` pointing to `GET /api/flights/{id}`. A duplicate reconstructed flight is treated as idempotent and returns `200 OK` with `Status: Duplicate` and the existing `FlightId`. Empty, non-JSON, malformed, or unusable trajectories return `400 Bad Request`; warnings on an otherwise valid import remain part of a successful result. The response contains import metadata only, not telemetry.
 
+Successful responses include a `diagnostics` object with `source`, logical `filename`, UTC `importedAtUtc`, `recordsRead`, `recordsRejected`, aggregated `warnings`, and numeric `durationMilliseconds`. Diagnostics are returned by the application workflow but are not persisted as import history in the current persistence design.
+
 The response contains flight identity, time bounds, callsign, and summary location/altitude fields. Telemetry and events are not included.
 
 The file `src/Hosts/Fip.Api/Fip.Api.http` contains example requests for these endpoints. Range filtering, sampling, and downsampling are future extensions for large trajectories. Upload size limits and background import processing remain future concerns.

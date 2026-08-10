@@ -104,6 +104,20 @@ public sealed class TakeoffDetectorTests
     }
 
     [Fact]
+    public void Detect_RecognizesTrajectoryThatStartsInLowAltitudeClimb()
+    {
+        var points = Enumerable.Range(0, 10)
+            .Select(index => CreatePoint(index, 155 + index, 224 + index * 50, 2_240))
+            .ToArray();
+
+        var result = _detector.Detect(points);
+
+        Assert.NotNull(result);
+        Assert.Equal(FlightEventType.Takeoff, result.Type);
+        Assert.Equal(CreateTimestamp(0), result.Timestamp);
+    }
+
+    [Fact]
     public void Detect_HandlesUnorderedTelemetry()
     {
         var early = CreatePoint(0, 10, 1_000, 0);

@@ -193,7 +193,8 @@ public sealed class FlightsControllerTests
             DateTimeOffset.Parse("2026-08-09T12:00:00Z"),
             DateTimeOffset.Parse("2026-08-09T13:00:00Z"),
             1,
-            []);
+            [],
+            CreateDiagnostics());
         var importer = new FakeImportFlightTrajectoryService { Result = importResult };
         var controller = new FlightsController(new FakeFlightQueryService(), importer);
         var request = new ImportFlightRequest
@@ -205,7 +206,9 @@ public sealed class FlightsControllerTests
 
         var result = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
         Assert.Equal(nameof(FlightsController.GetFlightById), result.ActionName);
-        Assert.Equal(importResult, result.Value);
+        var response = Assert.IsType<ImportFlightTrajectoryResponse>(result.Value);
+        Assert.Equal(ImportFlightTrajectoryResponse.FromResult(importResult), response);
+        Assert.Equal(12, response.Diagnostics.DurationMilliseconds);
         Assert.Equal("trajectory.json", importer.FileName);
     }
 
@@ -253,7 +256,8 @@ public sealed class FlightsControllerTests
             DateTimeOffset.Parse("2026-08-09T12:00:00Z"),
             DateTimeOffset.Parse("2026-08-09T13:00:00Z"),
             0,
-            ["Flight already exists."]);
+            ["Flight already exists."],
+            CreateDiagnostics());
         var controller = new FlightsController(
             new FakeFlightQueryService(),
             new FakeImportFlightTrajectoryService { Result = duplicate });
@@ -265,8 +269,19 @@ public sealed class FlightsControllerTests
         var actionResult = await controller.ImportFlight(request, CancellationToken.None);
 
         var result = Assert.IsType<OkObjectResult>(actionResult.Result);
-        Assert.Equal(duplicate, result.Value);
+        Assert.Equal(ImportFlightTrajectoryResponse.FromResult(duplicate), result.Value);
     }
+
+    private static FlightImportDiagnostics CreateDiagnostics() => new()
+    {
+        Source = "OpenSky",
+        Filename = "trajectory.json",
+        ImportedAtUtc = DateTimeOffset.Parse("2026-08-09T12:00:00Z"),
+        RecordsRead = 2,
+        RecordsRejected = 0,
+        Warnings = [],
+        Duration = TimeSpan.FromMilliseconds(12)
+    };
 
     private static FormFile CreateFormFile(string fileName, string contents)
     {
@@ -341,7 +356,8 @@ public sealed class FlightsControllerTests
             DateTimeOffset.UtcNow,
             DateTimeOffset.UtcNow.AddMinutes(1),
             0,
-            []);
+            [],
+            CreateDiagnostics());
         public Exception? Exception { get; init; }
         public string? FileName { get; private set; }
 

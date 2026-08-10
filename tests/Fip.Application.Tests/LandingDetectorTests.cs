@@ -54,6 +54,49 @@ public sealed class LandingDetectorTests
     }
 
     [Fact]
+    public void Detect_HandlesSingleSampleTouchdownSpeedDrop()
+    {
+        var points = new[]
+        {
+            CreatePoint(0, 150, 1_000, -800),
+            CreatePoint(1, 145, 800, -800),
+            CreatePoint(2, 140, 600, -700),
+            CreatePoint(3, 135, 300, -700),
+            CreatePoint(4, 135, 0, -700),
+            CreatePoint(5, 135, 0, -700),
+            CreatePoint(6, 135, 0, -700),
+            CreatePoint(7, 15, 0, 0)
+        };
+
+        var result = _detector.Detect(points);
+
+        Assert.NotNull(result);
+        Assert.Equal(FlightEventType.Landing, result.Type);
+        Assert.Equal(CreateTimestamp(4), result.Timestamp);
+    }
+
+    [Fact]
+    public void Detect_HandlesLowAltitudeTouchdownWhenGroundspeedDoesNotDecelerate()
+    {
+        var points = new[]
+        {
+            CreatePoint(0, 150, 300, -640),
+            CreatePoint(1, 150, 250, -640),
+            CreatePoint(2, 150, 200, -640),
+            CreatePoint(3, 150, 150, -640),
+            CreatePoint(4, 150, 100, -640),
+            CreatePoint(5, 150, 25, -640),
+            CreatePoint(6, 150, 0, -640),
+            CreatePoint(7, 150, 0, 0)
+        };
+
+        var result = _detector.Detect(points);
+
+        Assert.NotNull(result);
+        Assert.Equal(FlightEventType.Landing, result.Type);
+    }
+
+    [Fact]
     public void Detect_DoesNotClassifyTemporaryLevelOffAsLanding()
     {
         var points = new[]

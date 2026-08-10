@@ -23,7 +23,7 @@ public sealed class ImportFlightTrajectoryServiceTests
         var unitOfWork = new FakeUnitOfWork();
         var service = CreateService(importer, validator, reconstructor, eventDetection, summaryCalculator, repository, unitOfWork);
 
-        var result = await service.ImportAsync(new ImportFlightTrajectoryRequest("trajectory.json"));
+        var result = await service.ImportAsync(new ImportFlightTrajectoryRequest(@"C:\imports\trajectory.json"));
 
         Assert.Equal(reconstructor.Flight.Id, result.FlightId);
         Assert.Equal(ImportFlightTrajectoryStatus.Imported, result.Status);
@@ -34,6 +34,12 @@ public sealed class ImportFlightTrajectoryServiceTests
         Assert.Equal(reconstructor.Flight.EndTime, result.EndTime);
         Assert.Equal(reconstructor.Flight.Events.Count, result.EventsDetected);
         Assert.Empty(result.Warnings);
+        Assert.Equal("OpenSky", result.Diagnostics.Source);
+        Assert.Equal("trajectory.json", result.Diagnostics.Filename);
+        Assert.Equal(2, result.Diagnostics.RecordsRead);
+        Assert.Equal(0, result.Diagnostics.RecordsRejected);
+        Assert.True(result.Diagnostics.ImportedAtUtc <= DateTimeOffset.UtcNow);
+        Assert.True(result.Diagnostics.Duration >= TimeSpan.Zero);
         Assert.Same(reconstructor.Flight, repository.AddedFlight);
         Assert.True(importer.WasCalled);
         Assert.True(validator.WasCalled);
@@ -106,6 +112,9 @@ public sealed class ImportFlightTrajectoryServiceTests
         Assert.Contains("1 suspicious telemetry point was retained.", result.Warnings);
         Assert.NotNull(repository.AddedFlight);
         Assert.True(unitOfWork.WasCalled);
+        Assert.Equal(2, result.Diagnostics.RecordsRead);
+        Assert.Equal(1, result.Diagnostics.RecordsRejected);
+        Assert.Equal(result.Warnings, result.Diagnostics.Warnings);
     }
 
     [Fact]

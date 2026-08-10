@@ -48,7 +48,7 @@ dotnet test tests/Fip.Application.Tests/Fip.Application.Tests.csproj
 dotnet test tests/Fip.Infrastructure.Tests/Fip.Infrastructure.Tests.csproj
 ```
 
-The current test suite uses xUnit. Application and Infrastructure tests use temporary data for the implemented OpenSky paths. Domain and Integration test projects currently contain placeholder tests.
+The current test suite uses xUnit. Application and Infrastructure tests use temporary data for focused OpenSky paths. The application integration suite also runs the real TRA051 fixture at `data/samples/opensky/TRA051_B738_2018-05-30.json` through the complete import, normalization, validation, reconstruction, event-detection, summary, and persistence-boundary workflow. Domain and Integration test projects currently contain placeholder tests.
 
 ## Run hosts and tools
 
@@ -109,7 +109,7 @@ The import page reports real HTTP upload progress when the browser provides tota
 
 ## Sample data
 
-No root `data/` directory or OpenSky sample file is present in the inspected checkout. The only data-related repository path is `src/Infrastructure/Fip.Persistence/Data/.gitkeep`. The importer accepts a caller-supplied file path and does not depend on a fixed sample location.
+The OpenSky integration fixture is `data/samples/opensky/TRA051_B738_2018-05-30.json`. The importer accepts a caller-supplied file path and does not depend on a fixed sample location.
 
 ## Development conventions observed
 

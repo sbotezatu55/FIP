@@ -14,7 +14,7 @@ public sealed class FlightsController(
 {
     [HttpPost("import")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<ImportFlightTrajectoryResult>> ImportFlight(
+    public async Task<ActionResult<ImportFlightTrajectoryResponse>> ImportFlight(
         [FromForm] ImportFlightRequest request,
         CancellationToken cancellationToken)
     {
@@ -59,13 +59,13 @@ public sealed class FlightsController(
 
             if (result.Status == ImportFlightTrajectoryStatus.Duplicate)
             {
-                return Ok(result);
+                return Ok(ImportFlightTrajectoryResponse.FromResult(result));
             }
 
             return CreatedAtAction(
                 nameof(GetFlightById),
                 new { id = result.FlightId },
-                result);
+                ImportFlightTrajectoryResponse.FromResult(result));
         }
         catch (JsonException exception)
         {

@@ -1,6 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { FlightDetail } from '../../models/flight-detail';
@@ -23,6 +23,7 @@ import { FlightEvent } from '../../models/flight-event';
 export class FlightDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly flightsApi = inject(FlightsApiService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   flight: FlightDetail | null = null;
   summary: FlightSummary | null = null;
@@ -82,10 +83,12 @@ export class FlightDetailPageComponent {
         }
 
         this.isLoading = false;
+        this.changeDetector.markForCheck();
       },
       error: () => {
         this.isLoading = false;
         this.errorMessage = 'Unable to load flight details.';
+        this.changeDetector.markForCheck();
       }
     });
 
@@ -93,10 +96,12 @@ export class FlightDetailPageComponent {
       next: (telemetry) => {
         this.telemetry = telemetry;
         this.telemetryLoading = false;
+        this.changeDetector.markForCheck();
       },
       error: () => {
         this.telemetryLoading = false;
         this.telemetryErrorMessage = 'Unable to load flight trajectory.';
+        this.changeDetector.markForCheck();
       }
     });
 
@@ -104,10 +109,12 @@ export class FlightDetailPageComponent {
       next: (events) => {
         this.events = events;
         this.eventsLoading = false;
+        this.changeDetector.markForCheck();
       },
       error: () => {
         this.eventsLoading = false;
         this.eventsErrorMessage = 'Unable to load flight events.';
+        this.changeDetector.markForCheck();
       }
     });
   }

@@ -36,9 +36,9 @@ The Domain project currently contains two concrete domain types: `Flight` in the
 
 ### Takeoff detection
 
-`TakeoffDetector` is an Application-layer heuristic that may produce a `FlightEvent` of type `Takeoff` when telemetry shows a groundspeed transition followed by sustained altitude gain and climb evidence. It requires pre-transition low-speed observations and continued climb after the candidate, so an already-airborne segment or isolated noisy sample does not produce an event. Detection does not mutate the `Flight` aggregate.
+`TakeoffDetector` is an Application-layer heuristic that may produce a `FlightEvent` of type `Takeoff` when telemetry shows a groundspeed transition followed by sustained altitude gain and climb evidence. When a source begins shortly after lift-off, it can instead use a low-altitude sustained-climb window at the trajectory start; a high-altitude already-airborne segment or isolated noisy sample does not produce an event. Detection does not mutate the `Flight` aggregate.
 
-`LandingDetector` is an Application-layer heuristic that may produce a `FlightEvent` of type `Landing` when sustained relative descent is followed by a stabilized altitude and decelerating rollout. It does not use an absolute runway-elevation threshold and rejects trajectories that show a later sustained climb consistent with a go-around.
+`LandingDetector` is an Application-layer heuristic that may produce a `FlightEvent` of type `Landing` when sustained relative descent is followed by a stabilized altitude and rollout evidence. It accepts either a decelerating rollout or a low-altitude touchdown window when the source holds groundspeed through the sampled rollout. It rejects trajectories that show a later sustained climb consistent with a go-around.
 
 `IFlightEventDetector` is the common Application abstraction for detectors that may return zero, one, or multiple `FlightEvent` instances. `FlightEventDetectionService` receives all registered detectors through dependency injection, combines their results, and returns them chronologically. It remains a pure detection operation; callers may explicitly associate the returned events with `Flight` through `AddEvent`.
 

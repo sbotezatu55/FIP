@@ -72,6 +72,21 @@ public sealed class TakeoffDetector : ITakeoffDetector, IFlightEventDetector
                 "Takeoff detected from sustained groundspeed and climb evidence.");
         }
 
+        var initialClimbWindow = orderedTelemetryPoints
+            .Take(_options.InitialClimbSamples)
+            .ToList();
+
+        if (HasInitialClimbEvidence(initialClimbWindow))
+        {
+            var candidate = initialClimbWindow[0];
+
+            return new FlightEvent(
+                FlightEventType.Takeoff,
+                candidate.Timestamp,
+                candidate,
+                "Takeoff inferred from low-altitude sustained climb at the start of the trajectory.");
+        }
+
         return null;
     }
 
@@ -157,6 +172,23 @@ public sealed class TakeoffDetector : ITakeoffDetector, IFlightEventDetector
                finalAltitude.Value - candidateAltitude.Value >= _options.MinimumAltitudeGainFeet;
     }
 
+    private bool HasInitialClimbEvidence(IReadOnlyList<FlightTelemetryPoint> initialClimbWindow)
+    {
+        var initialAltitude = initialClimbWindow[0].AltitudeFeet;
+        var initialGroundspeed = initialClimbWindow[0].GroundSpeedKnots;
+
+        if (initialClimbWindow.Count < _options.InitialClimbSamples ||
+            initialAltitude is null ||
+            initialAltitude > _options.MaximumInitialAltitudeFeet ||
+            initialGroundspeed is null ||
+            initialGroundspeed.Value < _options.MinimumTakeoffGroundspeedKnots)
+        {
+            return false;
+        }
+
+        return HasSustainedClimb(initialClimbWindow);
+    }
+
     private static void ValidateOptions(TakeoffDetectionOptions options)
     {
         if (options.MinimumTakeoffGroundspeedKnots < 0 ||
@@ -166,7 +198,9 @@ public sealed class TakeoffDetector : ITakeoffDetector, IFlightEventDetector
             options.MinimumPositiveAltitudeSteps < 1 ||
             options.MinimumPositiveAltitudeSteps >= options.SustainedClimbSamples ||
             options.MinimumAirborneSamplesAfterCandidate < 1 ||
-            options.MinimumClimbRateFeetPerMinute < 0)
+            options.MinimumClimbRateFeetPerMinute < 0 ||
+            options.InitialClimbSamples < options.SustainedClimbSamples ||
+            options.MaximumInitialAltitudeFeet <= 0)
         {
             throw new ArgumentException("Takeoff detection options must define positive, compatible thresholds.", nameof(options));
         }

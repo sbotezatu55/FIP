@@ -55,7 +55,10 @@ public sealed class LandingDetector : ILandingDetector, IFlightEventDetector
                 .Take(_options.RolloutSamples)
                 .ToList();
 
-            if (!HasSustainedApproachDescent(approach) ||
+            var hasSustainedApproachDescent = HasSustainedApproachDescent(approach);
+            var hasLowAltitudeTouchdownApproach = HasLowAltitudeTouchdownApproach(approach, rollout);
+
+            if ((!hasSustainedApproachDescent && !hasLowAltitudeTouchdownApproach) ||
                 !HasRolloutEvidence(approach, rollout) ||
                 HasGoAroundAfter(orderedTelemetryPoints, candidateIndex))
             {
@@ -132,17 +135,38 @@ public sealed class LandingDetector : ILandingDetector, IFlightEventDetector
         }
 
         var altitudeVariation = altitudes.Max()!.Value - altitudes.Min()!.Value;
+        var descendingAltitudeSteps = altitudes
+            .Zip(altitudes.Skip(1), (previous, next) => previous!.Value - next!.Value)
+            .Count(delta => delta > 0);
         var decreasingSpeedSteps = groundspeeds
             .Zip(groundspeeds.Skip(1), (previous, next) => previous!.Value - next!.Value)
             .Count(delta => delta > 0);
         var approachGroundspeed = approach[^1].GroundSpeedKnots;
         var finalGroundspeed = groundspeeds[^1]!.Value;
 
+        var speedRolloutEvidence = finalGroundspeed <= _options.MaximumRolloutGroundspeedKnots &&
+                                   approachGroundspeed.HasValue &&
+                                   approachGroundspeed.Value - finalGroundspeed >= _options.MinimumGroundspeedReductionKnots &&
+                                   decreasingSpeedSteps >= _options.MinimumDecreasingGroundspeedSteps;
+        var lowAltitudeTouchdownEvidence = altitudes[^1]!.Value <= _options.MaximumTouchdownAltitudeFeet &&
+                                           descendingAltitudeSteps >= 1 &&
+                                           rollout.Any(point => point.VerticalRateFeetPerMinute <= -_options.MinimumDescentRateFeetPerMinute);
+
         return altitudeVariation <= _options.MaximumRolloutAltitudeVariationFeet &&
-               finalGroundspeed <= _options.MaximumRolloutGroundspeedKnots &&
-               approachGroundspeed.HasValue &&
-               approachGroundspeed.Value - finalGroundspeed >= _options.MinimumGroundspeedReductionKnots &&
-               decreasingSpeedSteps >= 2;
+               (speedRolloutEvidence || lowAltitudeTouchdownEvidence);
+    }
+
+    private bool HasLowAltitudeTouchdownApproach(
+        IReadOnlyList<FlightTelemetryPoint> approach,
+        IReadOnlyList<FlightTelemetryPoint> rollout)
+    {
+        var approachAltitude = approach[0].AltitudeFeet;
+        var finalAltitude = rollout[^1].AltitudeFeet;
+
+        return approachAltitude.HasValue &&
+               finalAltitude.HasValue &&
+               finalAltitude.Value <= _options.MaximumTouchdownAltitudeFeet &&
+               approachAltitude.Value - finalAltitude.Value >= _options.MinimumTouchdownAltitudeLossFeet;
     }
 
     private bool HasGoAroundAfter(
@@ -192,6 +216,9 @@ public sealed class LandingDetector : ILandingDetector, IFlightEventDetector
             options.MaximumRolloutAltitudeVariationFeet < 0 ||
             options.MaximumRolloutGroundspeedKnots < 0 ||
             options.MinimumGroundspeedReductionKnots < 0 ||
+            options.MinimumDecreasingGroundspeedSteps < 1 ||
+            options.MaximumTouchdownAltitudeFeet < 0 ||
+            options.MinimumTouchdownAltitudeLossFeet <= 0 ||
             options.MinimumGoAroundClimbSamples < 2 ||
             options.MinimumGoAroundAltitudeGainFeet <= 0)
         {

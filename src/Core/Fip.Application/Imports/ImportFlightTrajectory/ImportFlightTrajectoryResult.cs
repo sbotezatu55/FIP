@@ -15,4 +15,5 @@ public sealed record ImportFlightTrajectoryResult(
     DateTimeOffset StartTime,
     DateTimeOffset EndTime,
     int EventsDetected,
-    IReadOnlyList<string> Warnings);
+    IReadOnlyList<string> Warnings,
+    FlightImportDiagnostics Diagnostics);

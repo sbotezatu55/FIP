@@ -21,6 +21,19 @@ public sealed record LandingDetectionOptions
 
     public double MinimumGroundspeedReductionKnots { get; init; } = 20;
 
+    /// <summary>
+    /// OpenSky can represent touchdown as one abrupt sampled speed drop.
+    /// </summary>
+    public int MinimumDecreasingGroundspeedSteps { get; init; } = 1;
+
+    /// <summary>
+    /// Permits touchdown evidence when the source holds landing speed through the
+    /// rollout but reports a sustained descent into a low-altitude stabilized window.
+    /// </summary>
+    public double MaximumTouchdownAltitudeFeet { get; init; } = 300;
+
+    public double MinimumTouchdownAltitudeLossFeet { get; init; } = 50;
+
     public int MinimumGoAroundClimbSamples { get; init; } = 3;
 
     public double MinimumGoAroundAltitudeGainFeet { get; init; } = 300;

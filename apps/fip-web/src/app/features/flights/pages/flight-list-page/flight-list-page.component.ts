@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { FlightListItem } from '../../models/flight-list-item';
@@ -13,6 +13,7 @@ import { FlightsApiService } from '../../services/flights-api.service';
 })
 export class FlightListPageComponent {
   private readonly flightsApi = inject(FlightsApiService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   flights: FlightListItem[] = [];
   isLoading = true;
@@ -28,12 +29,19 @@ export class FlightListPageComponent {
 
     this.flightsApi
       .getFlights()
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.changeDetector.markForCheck();
+      }))
       .subscribe({
-        next: (flights) => (this.flights = flights),
+        next: (flights) => {
+          this.flights = flights;
+          this.changeDetector.markForCheck();
+        },
         error: () => {
           this.flights = [];
           this.errorMessage = 'Unable to load flights.';
+          this.changeDetector.markForCheck();
         }
       });
   }

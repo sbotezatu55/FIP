@@ -20,6 +20,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Core\Fip.Application\Fip.Application.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\Fip.Infrastructure\Fip.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\data\samples\opensky\TRA051_B738_2018-05-30.json"
+          Link="TestData\TRA051_B738_2018-05-30.json"
+          CopyToOutputDirectory="PreserveNewest"
+          Condition="Exists('..\..\data\samples\opensky\TRA051_B738_2018-05-30.json')" />
   </ItemGroup>
 
 </Project>
