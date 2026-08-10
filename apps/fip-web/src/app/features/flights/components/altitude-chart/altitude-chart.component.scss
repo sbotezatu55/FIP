@@ -1,0 +1,33 @@
+.altitude-chart-shell {
+  min-height: 340px;
+  padding: 1rem;
+  border: 1px solid #dbe4ee;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+.chart-container {
+  position: relative;
+  height: 340px;
+}
+
+.chart-empty {
+  display: grid;
+  min-height: 300px;
+  place-items: center;
+  padding: 2rem;
+  margin: 0;
+  color: #526579;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .altitude-chart-shell {
+    min-height: 300px;
+    padding: 0.5rem;
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+}

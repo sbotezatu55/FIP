@@ -1,0 +1,24 @@
+@Fip.Api_HostAddress = http://localhost:5271
+
+GET {{Fip.Api_HostAddress}}/api/flights
+Accept: application/json
+
+###
+
+GET {{Fip.Api_HostAddress}}/api/flights/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+###
+
+GET {{Fip.Api_HostAddress}}/api/flights/00000000-0000-0000-0000-000000000000/summary
+Accept: application/json
+
+###
+
+GET {{Fip.Api_HostAddress}}/api/flights/00000000-0000-0000-0000-000000000000/telemetry
+Accept: application/json
+
+###
+
+GET {{Fip.Api_HostAddress}}/api/flights/00000000-0000-0000-0000-000000000000/events
+Accept: application/json

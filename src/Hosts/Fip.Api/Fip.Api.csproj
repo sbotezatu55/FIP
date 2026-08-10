@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>fip-api-development</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Fip.Application\Fip.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Fip.Infrastructure\Fip.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Fip.Persistence\Fip.Persistence.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Fip.Identity\Fip.Identity.csproj" />
+  </ItemGroup>
+
+</Project>

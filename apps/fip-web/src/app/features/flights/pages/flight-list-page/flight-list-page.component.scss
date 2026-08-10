@@ -1,0 +1,130 @@
+.flights-page {
+  padding: 3.5rem 0 4rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: #1b6ca8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0.5rem;
+  color: #12304a;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.page-header > p:last-child {
+  margin-bottom: 0;
+  color: #526579;
+  font-size: 1.05rem;
+}
+
+.status-message,
+.status-panel {
+  padding: 2rem;
+  border: 1px solid #dbe4ee;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #526579;
+}
+
+.status-panel h2 {
+  margin-bottom: 0.5rem;
+  color: #12304a;
+  font-size: 1.25rem;
+}
+
+.status-panel p:last-of-type {
+  margin-bottom: 0;
+}
+
+.status-panel--error {
+  border-color: #e5b4b4;
+  color: #8b2d2d;
+}
+
+.secondary-button {
+  padding: 0.65rem 1rem;
+  border: 1px solid #1b6ca8;
+  border-radius: 0.4rem;
+  background: #ffffff;
+  color: #1b6ca8;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.table-container {
+  overflow-x: auto;
+  border: 1px solid #dbe4ee;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  box-shadow: 0 0.5rem 1.5rem rgb(18 48 74 / 6%);
+}
+
+table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid #edf1f5;
+  white-space: nowrap;
+}
+
+th {
+  background: #f7fafd;
+  color: #526579;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover {
+  background: #f8fbfe;
+}
+
+.flight-callsign a,
+.view-link {
+  color: #1b6ca8;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.flight-callsign a:hover,
+.view-link:hover {
+  text-decoration: underline;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,80 @@
+<section class="import-page" aria-labelledby="import-title">
+  <a class="back-link" routerLink="/flights">← Back to Flights</a>
+
+  <header class="page-header">
+    <p class="eyebrow">Flight ingestion</p>
+    <h1 id="import-title">Import Flight Data</h1>
+    <p>Upload an OpenSky trajectory JSON file for reconstruction and analysis.</p>
+  </header>
+
+  <div class="import-card">
+    <div class="file-field">
+      <label for="flight-file">OpenSky JSON trajectory</label>
+      <input
+        id="flight-file"
+        type="file"
+        accept=".json,application/json"
+        [disabled]="isImporting"
+        (change)="onFileSelected($event)" />
+    </div>
+
+    @if (selectedFile) {
+      <p class="selected-file" role="status">
+        <strong>{{ selectedFile.name }}</strong>
+        <span>{{ formatFileSize(selectedFile.size) }}</span>
+      </p>
+    } @else {
+      <p class="file-hint">Choose a JSON trajectory file to begin.</p>
+    }
+
+    <button
+      class="primary-button"
+      type="button"
+      [disabled]="!selectedFile || isImporting"
+      (click)="importFlight()">
+      {{ isImporting ? 'Importing...' : 'Import Flight' }}
+    </button>
+
+    @if (importState === 'uploading' || importState === 'processing') {
+      <section class="progress-panel" role="status" aria-live="polite" aria-labelledby="import-status-title">
+        <h2 id="import-status-title">Import Status</h2>
+        @if (importState === 'uploading') {
+          <p class="status-heading">Uploading flight data...</p>
+          @if (uploadPercent !== null) {
+            <label class="progress-label" for="upload-progress">Uploading: {{ uploadPercent }}%</label>
+            <progress id="upload-progress" max="100" [value]="uploadPercent">{{ uploadPercent }}%</progress>
+          }
+        } @else {
+          <p class="status-heading">Processing flight...</p>
+          <p class="status-detail">The server is validating telemetry, reconstructing the flight, detecting events, and calculating the summary.</p>
+        }
+      </section>
+    }
+
+    @if (importState === 'failed' && errorMessage) {
+      <section class="progress-panel progress-panel--error" role="alert">
+        <h2>Flight import failed</h2>
+        <p class="status-detail">{{ errorMessage }}</p>
+        <button class="secondary-button" type="button" (click)="importFlight()" [disabled]="!selectedFile">Retry Import</button>
+      </section>
+    }
+
+    @if (importState === 'completed' && importResult) {
+      <div class="result-panel" role="status">
+        <h2>{{ importResult.status === 'Duplicate' ? 'Flight already imported' : 'Flight imported successfully' }}</h2>
+        <p>
+          {{ importResult.callsign || importResult.icao24 }} · {{ importResult.pointsImported | number: '1.0-0' }} points ·
+          {{ importResult.eventsDetected | number: '1.0-0' }} events
+        </p>
+        @if (importResult.warnings.length > 0) {
+          <ul>
+            @for (warning of importResult.warnings; track warning) {
+              <li>{{ warning }}</li>
+            }
+          </ul>
+        }
+        <a class="result-link" [routerLink]="['/flights', importResult.flightId]">View Flight</a>
+      </div>
+    }
+  </div>
+</section>

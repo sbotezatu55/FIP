@@ -1,0 +1,86 @@
+.timeline-empty {
+  padding: 1.35rem;
+  margin: 0;
+  border: 1px solid #dbe4ee;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #526579;
+}
+
+.event-timeline {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding: 0.5rem 0 0.5rem 1rem;
+  margin: 0;
+  list-style: none;
+}
+
+.event-timeline::before {
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 1.45rem;
+  width: 2px;
+  background: #dbe4ee;
+  content: '';
+}
+
+.timeline-event {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  gap: 1rem;
+  min-height: 5rem;
+}
+
+.timeline-marker {
+  z-index: 1;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-top: 0.3rem;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: #1b6ca8;
+  box-shadow: 0 0 0 1px #b9c9d8;
+}
+
+.timeline-content {
+  padding: 0 0 1.5rem;
+}
+
+.timeline-content time {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #526579;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline-content h3 {
+  margin: 0 0 0.35rem;
+  color: #12304a;
+  font-size: 1.05rem;
+}
+
+.timeline-content p {
+  margin: 0;
+  color: #526579;
+}
+
+.timeline-event--takeoff .timeline-marker {
+  background: #1e8f63;
+}
+
+.timeline-event--landing .timeline-marker {
+  background: #c65555;
+}
+
+.timeline-event--topofclimb .timeline-marker,
+.timeline-event--topofdescent .timeline-marker {
+  background: #8a5a24;
+}
+
+.timeline-event--telemetrygap .timeline-marker {
+  background: #6a3d8e;
+}

@@ -1,0 +1,59 @@
+<section class="flights-page" aria-labelledby="flights-title">
+  <header class="page-header">
+    <p class="eyebrow">Flight selection</p>
+    <h1 id="flights-title">Flights</h1>
+    <p>Imported and reconstructed flight trajectories</p>
+  </header>
+
+  @if (isLoading) {
+    <p class="status-message" role="status">Loading flights...</p>
+  } @else if (errorMessage) {
+    <div class="status-panel status-panel--error" role="alert">
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="secondary-button" (click)="loadFlights()">Retry</button>
+    </div>
+  } @else if (flights.length === 0) {
+    <div class="status-panel">
+      <h2>No flights have been imported yet.</h2>
+      <p>Imported flights will appear here when they are available.</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <caption class="visually-hidden">Imported and reconstructed flights</caption>
+        <thead>
+          <tr>
+            <th scope="col">Callsign</th>
+            <th scope="col">ICAO24</th>
+            <th scope="col">Start</th>
+            <th scope="col">End</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Maximum Altitude</th>
+            <th scope="col"><span class="visually-hidden">Action</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (flight of flights; track flight.id) {
+            <tr>
+              <td class="flight-callsign">
+                <a [routerLink]="['/flights', flight.id]">{{ flight.callsign || '—' }}</a>
+              </td>
+              <td>{{ flight.icao24 }}</td>
+              <td>{{ flight.startTime | date: 'medium' }}</td>
+              <td>{{ flight.endTime | date: 'medium' }}</td>
+              <td>{{ formatDuration(flight.duration) }}</td>
+              <td>
+                @if (flight.maximumAltitudeFeet !== null) {
+                  {{ flight.maximumAltitudeFeet | number: '1.0-0' }} ft
+                } @else {
+                  —
+                }
+              </td>
+              <td><a class="view-link" [routerLink]="['/flights', flight.id]">View</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

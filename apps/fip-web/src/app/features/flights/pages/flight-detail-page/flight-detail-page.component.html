@@ -1,0 +1,156 @@
+<section class="detail-page" aria-labelledby="flight-detail-title">
+  <a class="back-link" routerLink="/flights">← Back to Flights</a>
+
+  @if (isLoading) {
+    <p class="status-message" role="status">Loading flight...</p>
+  } @else if (notFound) {
+    <div class="status-panel" role="alert">
+      <h1 id="flight-detail-title">Flight not found.</h1>
+      <p>The selected flight could not be found.</p>
+      <a class="primary-button" routerLink="/flights">Back to Flights</a>
+    </div>
+  } @else if (errorMessage) {
+    <div class="status-panel" role="alert">
+      <h1 id="flight-detail-title">Unable to load flight details.</h1>
+      <p>Please return to the Flights list and try again.</p>
+      <a class="primary-button" routerLink="/flights">Back to Flights</a>
+    </div>
+  } @else if (flight) {
+    <header class="flight-header">
+      <div>
+        <p class="eyebrow">Flight dashboard</p>
+        <h1 id="flight-detail-title">{{ flight.callsign || flight.icao24 }}</h1>
+        <p class="flight-identifier">ICAO24 {{ flight.icao24 }}</p>
+      </div>
+    </header>
+
+    <section class="dashboard-section" aria-labelledby="flight-information-title">
+      <h2 id="flight-information-title">Flight Information</h2>
+      <div class="information-grid">
+        <div class="information-item">
+          <dt>Callsign</dt>
+          <dd>{{ flight.callsign || '—' }}</dd>
+        </div>
+        <div class="information-item">
+          <dt>ICAO24</dt>
+          <dd>{{ flight.icao24 }}</dd>
+        </div>
+        <div class="information-item">
+          <dt>Start</dt>
+          <dd>{{ flight.startTime | date: 'medium' }}</dd>
+        </div>
+        <div class="information-item">
+          <dt>End</dt>
+          <dd>{{ flight.endTime | date: 'medium' }}</dd>
+        </div>
+        <div class="information-item">
+          <dt>Departure Position</dt>
+          <dd>{{ formatPosition(flight.departureLatitude, flight.departureLongitude) }}</dd>
+        </div>
+        <div class="information-item">
+          <dt>Arrival Position</dt>
+          <dd>{{ formatPosition(flight.arrivalLatitude, flight.arrivalLongitude) }}</dd>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="flight-summary-title">
+      <div class="section-heading">
+        <h2 id="flight-summary-title">Flight Summary</h2>
+        @if (summaryErrorMessage) {
+          <p class="summary-error" role="status">{{ summaryErrorMessage }}</p>
+        }
+      </div>
+
+      @if (summary) {
+        <div class="summary-grid">
+          <article class="summary-card">
+            <span>Duration</span>
+            <strong>{{ formatDuration(summary.duration || flight.duration) }}</strong>
+          </article>
+          <article class="summary-card">
+            <span>Maximum Altitude</span>
+            <strong>{{ formatAltitude(summary.maximumAltitudeFeet ?? flight.maximumAltitudeFeet) }}</strong>
+          </article>
+          <article class="summary-card">
+            <span>Distance</span>
+            <strong>{{ summary.distanceTraveledNauticalMiles | number: '1.0-0' }} nm</strong>
+          </article>
+          <article class="summary-card">
+            <span>Maximum Groundspeed</span>
+            <strong>{{ summary.maximumGroundSpeedKnots === null ? '—' : (summary.maximumGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong>
+          </article>
+          <article class="summary-card">
+            <span>Average Groundspeed</span>
+            <strong>{{ summary.averageGroundSpeedKnots === null ? '—' : (summary.averageGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong>
+          </article>
+        </div>
+      } @else if (!summaryErrorMessage) {
+        <p class="status-message">Loading summary...</p>
+      }
+    </section>
+
+    <section class="dashboard-section trajectory-section" aria-labelledby="trajectory-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="trajectory-title">Trajectory</h2>
+          <p class="section-subtitle">Aircraft position reconstructed from telemetry</p>
+        </div>
+      </div>
+      @if (telemetryLoading) {
+        <p class="status-message" role="status">Loading trajectory...</p>
+      } @else if (telemetryErrorMessage) {
+        <p class="status-message status-message--error" role="alert">{{ telemetryErrorMessage }}</p>
+      } @else {
+        <app-trajectory-map [telemetry]="telemetry" />
+      }
+    </section>
+
+    <section class="dashboard-section altitude-section" aria-labelledby="altitude-title">
+      <h2 id="altitude-title">Altitude Profile</h2>
+      <p class="section-subtitle">Aircraft altitude throughout the reconstructed flight</p>
+      @if (telemetryLoading) {
+        <p class="status-message" role="status">Loading altitude profile...</p>
+      } @else if (telemetryErrorMessage) {
+        <p class="status-message status-message--error" role="alert">{{ telemetryErrorMessage }}</p>
+      } @else {
+        <app-altitude-chart [telemetry]="telemetry" />
+      }
+    </section>
+
+    <section class="dashboard-section groundspeed-section" aria-labelledby="groundspeed-title">
+      <h2 id="groundspeed-title">Groundspeed Profile</h2>
+      <p class="section-subtitle">Aircraft groundspeed throughout the reconstructed flight</p>
+      @if (telemetryLoading) {
+        <p class="status-message" role="status">Loading groundspeed profile...</p>
+      } @else if (telemetryErrorMessage) {
+        <p class="status-message status-message--error" role="alert">{{ telemetryErrorMessage }}</p>
+      } @else {
+        <app-groundspeed-chart [telemetry]="telemetry" />
+      }
+    </section>
+
+    <section class="dashboard-section vertical-rate-section" aria-labelledby="vertical-rate-title">
+      <h2 id="vertical-rate-title">Vertical Rate Profile</h2>
+      <p class="section-subtitle">Aircraft climb and descent rate throughout the reconstructed flight</p>
+      @if (telemetryLoading) {
+        <p class="status-message" role="status">Loading vertical-rate profile...</p>
+      } @else if (telemetryErrorMessage) {
+        <p class="status-message status-message--error" role="alert">{{ telemetryErrorMessage }}</p>
+      } @else {
+        <app-vertical-rate-chart [telemetry]="telemetry" />
+      }
+    </section>
+
+    <section class="dashboard-section events-section" aria-labelledby="flight-events-title">
+      <h2 id="flight-events-title">Flight Events</h2>
+      @if (eventsLoading) {
+        <p class="status-message" role="status">Loading flight events...</p>
+      } @else if (eventsErrorMessage) {
+        <p class="status-message status-message--error" role="alert">{{ eventsErrorMessage }}</p>
+      } @else {
+        <app-flight-event-timeline [events]="events" />
+      }
+    </section>
+  }
+</section>

@@ -1,0 +1,6 @@
+<div class="map-shell">
+  @if (validCoordinates.length === 0) {
+    <p class="map-empty" role="status">Trajectory data is unavailable for this flight.</p>
+  }
+  <div #mapContainer class="map-container" [class.map-container--hidden]="validCoordinates.length === 0"></div>
+</div>
