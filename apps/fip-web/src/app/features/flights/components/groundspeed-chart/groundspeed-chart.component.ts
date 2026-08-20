@@ -53,13 +53,13 @@ export class GroundspeedChartComponent implements AfterViewInit, OnChanges, OnDe
           label: 'Groundspeed',
           data: points,
           parsing: false,
-          borderColor: '#8a5a24',
-          backgroundColor: 'rgb(138 90 36 / 12%)',
+          borderColor: '#21d4df',
+          backgroundColor: 'rgb(33 212 223 / 10%)',
           borderWidth: 2,
           fill: true,
           pointRadius: 0,
           pointHoverRadius: 4,
-          pointHoverBackgroundColor: '#8a5a24',
+          pointHoverBackgroundColor: '#85e63f',
           tension: 0,
           spanGaps: false
         }]
@@ -92,20 +92,22 @@ export class GroundspeedChartComponent implements AfterViewInit, OnChanges, OnDe
         scales: {
           x: {
             type: 'linear',
-            title: { display: true, text: 'Time' },
+            title: { display: true, text: 'Time', color: '#a2afb6' },
             ticks: {
+              color: '#a2afb6',
               maxTicksLimit: 8,
               callback: (value) => formatElapsedSeconds(Number(value), startTimestamp)
             },
-            grid: { color: 'rgb(18 48 74 / 8%)' }
+            grid: { color: 'rgb(71 152 183 / 18%)' }
           },
           y: {
             beginAtZero: true,
-            title: { display: true, text: 'Groundspeed (kt)' },
+            title: { display: true, text: 'Groundspeed (kt)', color: '#a2afb6' },
             ticks: {
+              color: '#a2afb6',
               callback: (value) => Number(value).toLocaleString('en-US')
             },
-            grid: { color: 'rgb(18 48 74 / 8%)' }
+            grid: { color: 'rgb(71 152 183 / 18%)' }
           }
         }
       }

@@ -15,9 +15,9 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
 
-    const links = Array.from(fixture.nativeElement.querySelectorAll('nav a')) as HTMLAnchorElement[];
+    const links = Array.from(fixture.nativeElement.querySelectorAll('.app-nav a')) as HTMLAnchorElement[];
 
-    expect(links.map((link) => link.textContent?.trim())).toEqual(['Index', 'Flights', 'Import Flight']);
+    expect(links.map((link) => link.textContent?.trim())).toEqual(['Flights', 'About', 'Features', 'Technology']);
   });
 
   it('configures the requested routes', () => {

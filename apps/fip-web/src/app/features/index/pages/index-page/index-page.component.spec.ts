@@ -15,12 +15,12 @@ describe('IndexPageComponent', () => {
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
-    const exploreLink = element.querySelector('a.primary-button') as HTMLAnchorElement;
+    const exploreLink = element.querySelector('a.fip-button--primary') as HTMLAnchorElement;
 
-    expect(element.textContent).toContain('Flight Intelligence Platform');
-    expect(element.textContent).toContain('Transforming aircraft trajectory data into meaningful flight intelligence.');
-    expect(element.textContent).toContain('Import, reconstruct, visualize, and analyze flight telemetry and flight events.');
-    expect(exploreLink.textContent?.trim()).toBe('Explore Flights');
+    expect(element.textContent).toContain('FlightIntelligencePlatform');
+    expect(element.textContent).toContain('From raw telemetry toflight intelligence.');
+    expect(element.textContent).toContain('Flight processing pipeline');
+    expect(exploreLink.textContent).toContain('Explore a Flight');
     expect(exploreLink.getAttribute('href')).toBe('/flights');
   });
 });

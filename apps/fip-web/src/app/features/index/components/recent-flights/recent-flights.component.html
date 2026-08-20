@@ -1,0 +1,42 @@
+<section class="recent-flights" aria-labelledby="recent-flights-title">
+  <div class="section-heading">
+    <div>
+      <p class="fip-eyebrow">Flight activity</p>
+      <h2 id="recent-flights-title" class="fip-section-title">Recent Flights</h2>
+    </div>
+    <a class="section-link" routerLink="/flights">View All Flights <span aria-hidden="true">→</span></a>
+  </div>
+
+  @if (isLoading) {
+    <div class="fip-panel status-panel" role="status">Loading recent flights...</div>
+  } @else if (errorMessage) {
+    <div class="fip-panel status-panel" role="status">{{ errorMessage }}</div>
+  } @else if (flights.length === 0) {
+    <div class="fip-panel status-panel">
+      <strong>No flights have been imported yet.</strong>
+      <span>Imported flights will appear here when they are available.</span>
+    </div>
+  } @else {
+    <div class="flight-table fip-panel">
+      <table>
+        <caption class="visually-hidden">Four most recent flights</caption>
+        <thead>
+          <tr><th scope="col">Callsign</th><th scope="col">Aircraft</th><th scope="col">Route</th><th scope="col">Duration</th><th scope="col">Max altitude</th><th scope="col">Date</th><th scope="col"><span class="visually-hidden">Action</span></th></tr>
+        </thead>
+        <tbody>
+          @for (flight of flights; track flight.id) {
+            <tr>
+              <td class="callsign"><a [routerLink]="['/flights', flight.id]">{{ flight.callsign || flight.icao24 }}</a></td>
+              <td>{{ flight.icao24 }}</td>
+              <td class="route">{{ flight.departureLatitude !== null ? 'Origin' : '—' }} <span aria-hidden="true">→</span> {{ flight.arrivalLatitude !== null ? 'Destination' : '—' }}</td>
+              <td>{{ formatDuration(flight.duration) }}</td>
+              <td>{{ flight.maximumAltitudeFeet === null ? '—' : (flight.maximumAltitudeFeet | number: '1.0-0') + ' ft' }}</td>
+              <td>{{ flight.startTime | date: 'dd MMM yyyy' | uppercase }}</td>
+              <td><a class="explore-link" [routerLink]="['/flights', flight.id]">Explore <span aria-hidden="true">→</span></a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

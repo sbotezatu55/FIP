@@ -1,9 +1,9 @@
 .groundspeed-chart-shell {
   min-height: 340px;
   padding: 1rem;
-  border: 1px solid #dbe4ee;
+  border: 1px solid var(--fip-border);
   border-radius: 0.75rem;
-  background: #ffffff;
+  background: var(--fip-bg-deep);
 }
 
 .chart-container {
@@ -17,7 +17,7 @@
   place-items: center;
   padding: 2rem;
   margin: 0;
-  color: #526579;
+  color: var(--fip-text-secondary);
   text-align: center;
 }
 

@@ -1,0 +1,18 @@
+.recent-flights { padding: 1rem 0 4rem; /* Move the Flight Activity section closer to the hero. */ }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+.section-heading .fip-eyebrow { margin-bottom: 0.35rem; }
+.section-link, .explore-link { color: var(--fip-green); font-size: 0.8rem; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; }
+.section-link:hover, .explore-link:hover { color: var(--fip-cyan); }
+.flight-table { overflow-x: auto; border: 0; }
+table { width: 100%; min-width: 900px; border-collapse: collapse; text-align: left; }
+th, td { padding: 1rem 1.1rem; border-bottom: 0; white-space: nowrap; }
+th { color: var(--fip-text-muted); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+td { color: var(--fip-text-secondary); font-size: 0.88rem; }
+tbody tr:hover { background: var(--fip-surface-alt); }
+.callsign a { color: var(--fip-text); font-weight: 700; text-decoration: none; }
+.callsign a:hover { color: var(--fip-green); }
+.route { color: var(--fip-text); }
+.route span { padding: 0 0.3rem; color: var(--fip-green); }
+.status-panel { display: flex; flex-direction: column; gap: 0.35rem; padding: 1.5rem; color: var(--fip-text-secondary); }
+.status-panel strong { color: var(--fip-text); }
+@media (max-width: 720px) { .section-heading { align-items: flex-start; flex-direction: column; } .recent-flights { padding: 1rem 0 2.5rem; /* Keep the Flight Activity section higher on smaller screens. */ } }

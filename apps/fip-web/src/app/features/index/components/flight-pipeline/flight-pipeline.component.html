@@ -1,0 +1,17 @@
+<section id="technology" class="pipeline" aria-labelledby="pipeline-title">
+  <div class="pipeline__intro">
+    <p class="fip-eyebrow">From signal to insight</p>
+    <h2 id="pipeline-title" class="fip-section-title">Flight processing pipeline</h2>
+  </div>
+  <div class="pipeline__stages">
+    @for (stage of stages; track stage.name; let last = $last) {
+      <article class="pipeline-stage">
+        <div class="pipeline-stage__icon"><app-fip-icon [name]="stage.icon" [size]="22" /></div>
+        <h3>{{ stage.name }}</h3>
+        <p>{{ stage.description }}</p>
+      </article>
+      @if (!last) { <span class="pipeline__arrow" aria-hidden="true">→</span> }
+    }
+  </div>
+  <p class="pipeline__summary">Transforming raw flight telemetry into reconstructed flights, detected events and aviation intelligence.</p>
+</section>

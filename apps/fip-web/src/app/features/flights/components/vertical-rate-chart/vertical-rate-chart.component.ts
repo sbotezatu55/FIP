@@ -53,13 +53,13 @@ export class VerticalRateChartComponent implements AfterViewInit, OnChanges, OnD
           label: 'Vertical Rate',
           data: points,
           parsing: false,
-          borderColor: '#6a3d8e',
-          backgroundColor: 'rgb(106 61 142 / 10%)',
+          borderColor: '#85e63f',
+          backgroundColor: 'rgb(133 230 63 / 9%)',
           borderWidth: 2,
           fill: true,
           pointRadius: 0,
           pointHoverRadius: 4,
-          pointHoverBackgroundColor: '#6a3d8e',
+          pointHoverBackgroundColor: '#21d4df',
           tension: 0,
           spanGaps: false
         }]
@@ -97,22 +97,24 @@ export class VerticalRateChartComponent implements AfterViewInit, OnChanges, OnD
         scales: {
           x: {
             type: 'linear',
-            title: { display: true, text: 'Time' },
+            title: { display: true, text: 'Time', color: '#a2afb6' },
             ticks: {
+              color: '#a2afb6',
               maxTicksLimit: 8,
               callback: (value) => formatElapsedSeconds(Number(value), startTimestamp)
             },
-            grid: { color: 'rgb(18 48 74 / 8%)' }
+            grid: { color: 'rgb(71 152 183 / 18%)' }
           },
           y: {
             beginAtZero: true,
-            title: { display: true, text: 'Vertical Rate (ft/min)' },
+            title: { display: true, text: 'Vertical Rate (ft/min)', color: '#a2afb6' },
             grace: '5%',
             ticks: {
+              color: '#a2afb6',
               callback: (value) => Number(value).toLocaleString('en-US')
             },
             grid: {
-              color: (context) => context.tick.value === 0 ? '#526579' : 'rgb(18 48 74 / 8%)',
+              color: (context) => context.tick.value === 0 ? '#21d4df' : 'rgb(71 152 183 / 18%)',
               lineWidth: (context) => context.tick.value === 0 ? 2 : 1
             }
           }

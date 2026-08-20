@@ -1,10 +1,23 @@
-<section class="index-page" aria-labelledby="index-title">
-  <div class="index-page__content">
-    <p class="index-page__eyebrow">Flight Intelligence Platform</p>
-    <h1 id="index-title">Transforming aircraft trajectory data into meaningful flight intelligence.</h1>
-    <p class="index-page__intro">
-      Import, reconstruct, visualize, and analyze flight telemetry and flight events.
-    </p>
-    <a class="primary-button" routerLink="/flights">Explore Flights</a>
-  </div>
-</section>
+<div class="index-page fip-page">
+  <section id="about" class="hero" aria-labelledby="index-title">
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="hero__content">
+      <p class="fip-eyebrow">Telemetry intelligence / 01</p>
+      <h1 id="index-title"><span>Flight</span><strong>Intelligence</strong><span>Platform</span></h1>
+      <p class="hero__tagline">From raw telemetry to<br />flight intelligence.</p>
+      <div class="hero__actions">
+        <a class="fip-button fip-button--primary" routerLink="/flights"><app-fip-icon name="aircraft" [size]="18" /> Explore a Flight</a>
+        <a class="fip-button fip-button--secondary" href="https://github.com/sbotezatu55/FIP" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">↗</span> GitHub</a>
+      </div>
+    </div>
+    <div class="hero__aircraft" aria-hidden="true">
+      <img src="/images/airframe-5.png" alt="" />
+    </div>
+    <div class="hero__trajectory" aria-hidden="true"></div>
+  </section>
+
+  <section id="features" class="landing-content" aria-label="FIP capabilities">
+    <app-recent-flights />
+    <app-flight-pipeline />
+  </section>
+</div>

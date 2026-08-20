@@ -16,7 +16,16 @@ const result: FlightImportResult = {
   startTime: '2018-05-30T12:04:00Z',
   endTime: '2018-05-30T14:37:00Z',
   eventsDetected: 5,
-  warnings: []
+  warnings: [],
+  diagnostics: {
+    source: 'OpenSky',
+    filename: 'trajectory.json',
+    importedAtUtc: '2018-05-30T14:37:00Z',
+    recordsRead: 5384,
+    recordsRejected: 0,
+    warnings: [],
+    durationMilliseconds: 120
+  }
 };
 
 describe('FlightImportPageComponent', () => {
