@@ -69,10 +69,10 @@ h1 {
 
 .table-container {
   overflow-x: auto;
-  border: 1px solid #dbe4ee;
-  border-radius: 0.75rem;
-  background: #ffffff;
-  box-shadow: 0 0.5rem 1.5rem rgb(18 48 74 / 6%);
+  border: 1px solid var(--fip-border);
+  border-radius: var(--fip-radius-md);
+  background: var(--fip-surface);
+  box-shadow: none;
 }
 
 table {
@@ -85,13 +85,13 @@ table {
 th,
 td {
   padding: 1rem 1.1rem;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid var(--fip-border-soft);
   white-space: nowrap;
 }
 
 th {
-  background: #f7fafd;
-  color: #526579;
+  background: var(--fip-surface-alt);
+  color: var(--fip-text-muted);
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -102,19 +102,34 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #f8fbfe;
+  background: var(--fip-surface-alt);
 }
 
 .flight-callsign a,
 .view-link {
-  color: #1b6ca8;
+  color: var(--fip-text);
   font-weight: 700;
   text-decoration: none;
 }
 
-.flight-callsign a:hover,
+.flight-callsign a:hover {
+  color: var(--fip-green);
+}
+
+.view-link {
+  color: var(--fip-green);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .view-link:hover {
-  text-decoration: underline;
+  color: var(--fip-cyan);
+}
+
+.view-link span {
+  display: inline-block;
+  margin-left: 0.25rem;
 }
 
 .visually-hidden {

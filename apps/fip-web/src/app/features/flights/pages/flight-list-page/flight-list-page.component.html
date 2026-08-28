@@ -1,7 +1,7 @@
 <section class="flights-page" aria-labelledby="flights-title">
   <header class="page-header">
-    <p class="eyebrow">Flight selection</p>
-    <h1 id="flights-title">Flights</h1>
+    <p class="fip-eyebrow">Flight selection</p>
+    <h2 id="flights-title" class="fip-section-title">Flights</h2>
     <p>Imported and reconstructed flight trajectories</p>
   </header>
 
@@ -49,7 +49,7 @@
                   —
                 }
               </td>
-              <td><a class="view-link" [routerLink]="['/flights', flight.id]">View</a></td>
+              <td><a class="view-link" [routerLink]="['/flights', flight.id]">Explore <span aria-hidden="true">→</span></a></td>
             </tr>
           }
         </tbody>

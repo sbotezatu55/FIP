@@ -18,38 +18,50 @@
   } @else if (flight) {
     <header class="flight-header">
       <div>
-        <p class="eyebrow">Flight dashboard</p>
-        <h1 id="flight-detail-title">{{ flight.callsign || flight.icao24 }}</h1>
-        <p class="flight-identifier">ICAO24 {{ flight.icao24 }}</p>
+        <p class="fip-eyebrow">Flight dashboard</p>
+        <h2 id="flight-detail-title" class="flight-title">{{ flight.callsign || flight.icao24 }}</h2>
+        <!--<p class="flight-identifier">ICAO24 {{ flight.icao24 }}</p>-->
       </div>
     </header>
 
     <section class="dashboard-section" aria-labelledby="flight-information-title">
-      <h2 id="flight-information-title">Flight Information</h2>
+      <h2 id="flight-information-title" class="box-title">Flight Information</h2>
       <div class="information-grid">
         <div class="information-item">
-          <dt>Callsign</dt>
-          <dd>{{ flight.callsign || '—' }}</dd>
+          <dl>
+            <dt>Callsign</dt>
+            <dd>{{ flight.callsign || '—' }}</dd>
+          </dl>
         </div>
         <div class="information-item">
-          <dt>ICAO24</dt>
-          <dd>{{ flight.icao24 }}</dd>
+         <dl>
+            <dt>ICAO24</dt>
+            <dd>{{ flight.icao24 }}</dd>
+          </dl>
         </div>
         <div class="information-item">
-          <dt>Start</dt>
-          <dd>{{ flight.startTime | date: 'medium' }}</dd>
+            <dl>
+              <dt>Start</dt>
+              <dd>{{ flight.startTime | date: 'medium' }}</dd>
+            </dl>
         </div>
         <div class="information-item">
-          <dt>End</dt>
-          <dd>{{ flight.endTime | date: 'medium' }}</dd>
+            <dl>
+              <dt>End</dt>
+              <dd>{{ flight.endTime | date: 'medium' }}</dd>
+            </dl>
         </div>
         <div class="information-item">
-          <dt>Departure Position</dt>
-          <dd>{{ formatPosition(flight.departureLatitude, flight.departureLongitude) }}</dd>
+            <dl>
+              <dt>Departure Position</dt>
+              <dd>{{ formatPosition(flight.departureLatitude, flight.departureLongitude) }}</dd>
+            </dl>
         </div>
         <div class="information-item">
-          <dt>Arrival Position</dt>
-          <dd>{{ formatPosition(flight.arrivalLatitude, flight.arrivalLongitude) }}</dd>
+            <dl>
+              <dt>Arrival Position</dt>
+              <dd>{{ formatPosition(flight.arrivalLatitude, flight.arrivalLongitude) }}</dd>
+            </dl>
         </div>
       </div>
     </section>

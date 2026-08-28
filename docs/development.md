@@ -52,13 +52,27 @@ The current test suite uses xUnit. Application and Infrastructure tests use temp
 
 ## Run hosts and tools
 
-Run the API:
+### Running FIP locally from Visual Studio
+
+For the normal development workflow:
+
+1. Open `FIP.sln` in Visual Studio.
+2. Set `Fip.Api` as the startup project.
+3. Press `F5`.
+
+The API runs under the Visual Studio debugger, and ASP.NET Core SPA Proxy automatically starts the Angular development server with `npm start` from `apps/fip-web`. Visual Studio first opens the API bootstrap URL at `http://localhost:5271`; SPA Proxy then starts Angular and redirects the browser to `http://localhost:4200`. Angular keeps hot reload/live rebuild enabled, and its existing `/api` development proxy forwards requests to the API at `http://localhost:5271`.
+
+The first run requires the .NET and Node.js prerequisites below, plus `npm install` once from `apps/fip-web` if `node_modules` is not present. Stopping the Visual Studio debugging session stops the SPA Proxy-launched frontend process with the session.
+
+### Manual host startup
+
+Run the API manually when Visual Studio is not being used:
 
 ```powershell
 dotnet run --project src/Hosts/Fip.Api/Fip.Api.csproj
 ```
 
-Run the Angular frontend in a second terminal:
+Run the Angular frontend manually for troubleshooting in a second terminal:
 
 ```powershell
 cd apps/fip-web

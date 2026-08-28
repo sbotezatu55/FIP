@@ -80,7 +80,7 @@ dotnet build FIP.sln
 dotnet test FIP.sln
 ```
 
-Run the API host with:
+Run the API host manually with:
 
 ```powershell
 dotnet run --project src/Hosts/Fip.Api/Fip.Api.csproj
@@ -88,7 +88,9 @@ dotnet run --project src/Hosts/Fip.Api/Fip.Api.csproj
 
 The API starts the host and exposes `GET /api/flights` and `GET /api/flights/{id}`. The default development launch settings use `http://localhost:5271` and `https://localhost:7219`.
 
-The Angular frontend is located at `apps/fip-web`. Run it with:
+For the normal local development workflow, open `FIP.sln` in Visual Studio, set `Fip.Api` as the startup project, and press `F5`. ASP.NET Core SPA Proxy automatically runs the Angular development server with `npm start`. Visual Studio opens the API bootstrap URL, then SPA Proxy redirects the browser to `http://localhost:4200`. The API runs under the debugger at `http://localhost:5271` (and `https://localhost:7219` when using the HTTPS profile), so C# breakpoints remain available. Angular hot reload remains enabled.
+
+The first run requires `npm install` once in `apps/fip-web` if dependencies are not installed. To troubleshoot Angular separately, run it manually from `apps/fip-web`:
 
 ```powershell
 cd apps/fip-web
