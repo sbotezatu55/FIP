@@ -3,7 +3,50 @@
   min-height: 460px;
   overflow: hidden;
   border-radius: 0.75rem;
-  background: #eaf0f5;
+  background: #08131d;
+}
+
+.map-fullscreen-button {
+  position: absolute;
+  z-index: 1000;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(33 212 223 / 45%);
+  border-radius: 0.35rem;
+  background: rgb(4 10 15 / 88%);
+  color: var(--fip-cyan);
+  cursor: pointer;
+}
+
+.map-fullscreen-button:hover,
+.map-fullscreen-button:focus-visible {
+  border-color: var(--fip-green);
+  color: var(--fip-green);
+}
+
+.map-fullscreen-button svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+:fullscreen.map-shell {
+  width: 100vw;
+  height: 100vh;
+  min-height: 0;
+  border-radius: 0;
+}
+
+:fullscreen.map-shell .map-container {
+  height: 100vh;
 }
 
 .map-container {
@@ -40,6 +83,21 @@
 
 :global(.trajectory-marker--end) {
   background: #c65555;
+}
+
+:global(.leaflet-control-zoom a) {
+  border-color: #29404f !important;
+  background: #0b1a26 !important;
+  color: var(--fip-cyan) !important;
+}
+
+:global(.leaflet-control-attribution) {
+  background: rgb(4 10 15 / 78%) !important;
+  color: #a2afb6;
+}
+
+:global(.leaflet-control-attribution a) {
+  color: var(--fip-cyan);
 }
 
 @media (max-width: 560px) {

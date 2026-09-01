@@ -2,6 +2,8 @@
 
 Flight Intelligence Platform (FIP) is a .NET solution being built to ingest, normalize, analyze, and persist flight and telemetry data. The repository currently contains the initial layered structure and an implemented OpenSky JSON trajectory import path.
 
+> FIP is an actively developed aviation technology portfolio project. This repository represents the public demonstration release. Continued development, additional integrations, and advanced analytical capabilities are maintained privately.
+
 ## Current capabilities
 
 - Defines source-independent `Flight` and `FlightTelemetryPoint` domain models.

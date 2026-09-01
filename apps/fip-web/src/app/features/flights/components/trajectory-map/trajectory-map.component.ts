@@ -24,16 +24,24 @@ export function toTrajectoryCoordinates(points: readonly FlightTelemetryPoint[])
 })
 export class TrajectoryMapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() telemetry: readonly FlightTelemetryPoint[] = [];
+  @ViewChild('mapShell') private mapShell?: ElementRef<HTMLDivElement>;
   @ViewChild('mapContainer') private mapContainer?: ElementRef<HTMLDivElement>;
 
   private map?: L.Map;
   private routeLayer?: L.LayerGroup;
+  isFullscreen = false;
+
+  private readonly handleFullscreenChange = (): void => {
+    this.isFullscreen = document.fullscreenElement === this.mapShell?.nativeElement;
+    window.setTimeout(() => this.map?.invalidateSize(), 0);
+  };
 
   get validCoordinates(): TrajectoryCoordinate[] {
     return toTrajectoryCoordinates(this.telemetry);
   }
 
   ngAfterViewInit(): void {
+    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
     this.renderMap();
   }
 
@@ -48,8 +56,20 @@ export class TrajectoryMapComponent implements AfterViewInit, OnChanges, OnDestr
   }
 
   ngOnDestroy(): void {
+    document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
     this.map?.remove();
     this.map = undefined;
+  }
+
+  toggleFullscreen(): void {
+    const shell = this.mapShell?.nativeElement;
+    if (!shell) return;
+
+    if (document.fullscreenElement === shell) {
+      void document.exitFullscreen();
+    } else {
+      void shell.requestFullscreen();
+    }
   }
 
   private renderMap(): void {
@@ -64,7 +84,8 @@ export class TrajectoryMapComponent implements AfterViewInit, OnChanges, OnDestr
 
     L.tileLayer(trajectoryMapConfig.tileUrl, {
       attribution: trajectoryMapConfig.attribution,
-      maxZoom: 19
+      maxZoom: 19,
+      className: 'trajectory-dark-tile'
     }).addTo(this.map);
 
     this.renderRoute();
@@ -80,8 +101,8 @@ export class TrajectoryMapComponent implements AfterViewInit, OnChanges, OnDestr
     if (coordinates.length === 0) return;
 
     L.polyline(coordinates, {
-      color: '#1b6ca8',
-      weight: 4,
+      color: 'var(--fip-cyan)',
+      weight: 3,
       opacity: 0.9,
       lineJoin: 'round'
     }).addTo(this.routeLayer);

@@ -41,6 +41,10 @@ a {
   font: inherit;
 }
 
+.trajectory-dark-tile {
+  filter: invert(92%) hue-rotate(180deg) brightness(86%) saturate(72%) contrast(92%) !important;
+}
+
 button,
 a,
 input,

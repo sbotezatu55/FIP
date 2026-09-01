@@ -129,6 +129,8 @@ The frontend uses standalone components, Angular Router, SCSS, strict TypeScript
 
 The import page reports real HTTP upload progress when the browser provides total byte information. Once upload completes, it shows backend processing as one truthful phase because the synchronous API does not expose internal stage progress.
 
+The Flight Detail trajectory map uses OpenStreetMap tiles with a tile-only dark-mode filter, preserving the FIP route and marker colors without requiring a map-provider API key. The map includes a fullscreen control that expands the route view using the browser Fullscreen API.
+
 ## Sample data
 
 The OpenSky integration fixture is `data/samples/opensky/TRA051_B738_2018-05-30.json`. The importer accepts a caller-supplied file path and does not depend on a fixed sample location.
