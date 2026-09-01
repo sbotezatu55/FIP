@@ -46,6 +46,8 @@ export class VerticalRateChartComponent implements AfterViewInit, OnChanges, OnD
     if (!this.chartCanvas || points.length === 0) return;
 
     const startTimestamp = points[0].timestamp;
+    const cyan = this.getThemeColor('--fip-cyan', '#21d4df');
+    const axis = this.getThemeColor('--fip-axis', '#f1f5f7');
     this.chart = new Chart(this.chartCanvas.nativeElement, {
       type: 'line',
       data: {
@@ -53,8 +55,8 @@ export class VerticalRateChartComponent implements AfterViewInit, OnChanges, OnD
           label: 'Vertical Rate',
           data: points,
           parsing: false,
-          borderColor: '#85e63f',
-          backgroundColor: 'rgb(133 230 63 / 9%)',
+          borderColor: cyan,
+          backgroundColor: 'rgb(33 212 223 / 9%)',
           borderWidth: 2,
           fill: true,
           pointRadius: 0,
@@ -97,9 +99,9 @@ export class VerticalRateChartComponent implements AfterViewInit, OnChanges, OnD
         scales: {
           x: {
             type: 'linear',
-            title: { display: true, text: 'Time', color: '#a2afb6' },
+            title: { display: true, text: 'Time', color: axis },
             ticks: {
-              color: '#a2afb6',
+              color: axis,
               maxTicksLimit: 8,
               callback: (value) => formatElapsedSeconds(Number(value), startTimestamp)
             },
@@ -114,13 +116,17 @@ export class VerticalRateChartComponent implements AfterViewInit, OnChanges, OnD
               callback: (value) => Number(value).toLocaleString('en-US')
             },
             grid: {
-              color: (context) => context.tick.value === 0 ? '#21d4df' : 'rgb(71 152 183 / 18%)',
-              lineWidth: (context) => context.tick.value === 0 ? 2 : 1
+              color: 'rgb(71 152 183 / 18%)',
+              lineWidth: 1
             }
           }
         }
       }
     });
+  }
+
+  private getThemeColor(variable: string, fallback: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim() || fallback;
   }
 
   private updateChart(): void {
