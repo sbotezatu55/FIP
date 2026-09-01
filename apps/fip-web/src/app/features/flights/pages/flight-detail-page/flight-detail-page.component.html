@@ -1,6 +1,4 @@
 <section class="detail-page" aria-labelledby="flight-detail-title">
-  <a class="back-link" routerLink="/flights">← Back to Flights</a>
-
   @if (isLoading) {
     <p class="status-message" role="status">Loading flight...</p>
   } @else if (notFound) {
@@ -17,8 +15,15 @@
     </div>
   } @else if (flight) {
     <header class="flight-header">
-      <p class="fip-eyebrow">Flight dashboard</p>
-      <h1 id="flight-detail-title" class="flight-title">{{ flight.callsign || flight.icao24 }}</h1>
+      <div class="flight-header__topline">
+        <a class="back-link" routerLink="/flights" aria-label="Back to Flights" title="Back to Flights">
+          <span class="back-link__icon" aria-hidden="true">←</span>
+        </a>
+        <p class="fip-eyebrow">FLIGHT DASHBOARD</p>
+      </div>
+      <!--
+         <h1 id="flight-detail-title" class="flight-title">{{ flight.callsign || flight.icao24 }}</h1>
+      -->
     </header>
 
 

@@ -1,6 +1,5 @@
 .technology-page { padding-bottom: 5rem; }
 .technology-hero { position: relative; padding: clamp(2.75rem, 5vw, 3.5rem) 0 clamp(2.5rem, 4vw, 3rem); border-bottom: 1px solid var(--fip-border); overflow: hidden; }
-.technology-hero::after { position: absolute; right: -10%; bottom: 1.5rem; width: 45%; height: 1px; background: var(--fip-green); opacity: .45; content: ''; transform: rotate(-8deg); }
 .technology-hero h1 { max-width: 760px; margin: 0; font-size: clamp(2rem, 4vw, 2.625rem); letter-spacing: -.045em; line-height: 1.08; text-transform: uppercase; }
 .technology-hero h1 strong { color: var(--fip-green); font-weight: 800; }
 .hero-intro { max-width: 780px; margin: 1.25rem 0 1.5rem; color: var(--fip-text-secondary); font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.6; }

@@ -8,18 +8,6 @@
   border-bottom: 1px solid var(--fip-border);
 }
 
-.features-hero::after {
-  position: absolute;
-  right: 0;
-  bottom: 1.5rem;
-  width: min(32rem, 45%);
-  height: 1px;
-  background: var(--fip-green);
-  opacity: 0.35;
-  content: '';
-  transform: rotate(-4deg);
-}
-
 .features-hero h1 {
   max-width: 760px;
   margin: 0;
@@ -99,11 +87,6 @@
 @media (max-width: 700px) {
   .features-hero {
     padding: 2.5rem 0 2.25rem;
-  }
-
-  .features-hero::after {
-    bottom: 1rem;
-    width: 40%;
   }
 
   .features-hero h1 {

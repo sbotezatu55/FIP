@@ -6,7 +6,7 @@ The initial persistence model is defined in `Fip.Persistence` using dedicated EF
 
 ## Database technology
 
-`Fip.Persistence` uses EF Core 10.0.9 with the SQL Server provider. Runtime registration reads the `ConnectionString-AppDb` connection-string key. Development credentials should be supplied through API user secrets or the `ConnectionStrings__ConnectionString-AppDb` environment variable; credentials are not stored in the repository. Design-time migrations target `DESKTOP-BIRS3VI\\SQLEXPRESS` and database `FIP`, with a safe integrated-security fallback when the environment variable is absent. Repository-local `dotnet-ef` tooling is pinned to 10.0.9.
+`Fip.Persistence` uses EF Core 10.0.9 with the SQL Server provider. Runtime registration reads the `ConnectionString-AppDb` connection-string key. Development credentials should be supplied through API user secrets or the `ConnectionStrings__ConnectionString-AppDb` environment variable; credentials are not stored in the repository. Design-time operations require the `ConnectionStrings__ConnectionString-AppDb` environment variable and do not use a machine-specific fallback. Repository-local `dotnet-ef` tooling is pinned to 10.0.9.
 
 ## Persistence abstractions
 
@@ -61,7 +61,7 @@ The composite index is an application-performance aid rather than a uniqueness c
 
 ## Database migration host
 
-`Fip.DatabaseMigrator` references `Fip.Persistence` but does not apply migrations yet. Migration commands use the repository-local EF tool and the design-time `FipDbContextFactory`.
+`Fip.DatabaseMigrator` references `Fip.Persistence`, loads the shared `fip-api-development` user-secrets store or environment configuration, and applies pending migrations with `Database.MigrateAsync()`. Migration commands use the repository-local EF tool and the design-time `FipDbContextFactory`.
 
 ## Configuration
 
@@ -73,11 +73,11 @@ dotnet user-secrets set "ConnectionStrings:ConnectionString-AppDb" "<local SQL S
 
 The equivalent environment variable is `ConnectionStrings__ConnectionString-AppDb`. The repository contains no database password.
 
-The design-time factory reads that environment variable and otherwise uses integrated security against `DESKTOP-BIRS3VI\\SQLEXPRESS`, database `FIP`.
+The design-time factory reads that environment variable and fails with a configuration error when it is absent. It does not contain a repository-specific server or database fallback.
 
 ## Initial migration
 
-`Migrations/20260809034530_InitialFlightTelemetrySchema.cs` creates `Flights`, `FlightTelemetryPoints`, and `FlightEvents`. `Migrations/20260809110000_AddFlightDuplicateLookupIndex.cs` adds the non-unique composite flight identity index. The migrations contain no seed data and have reversible `Down` operations. The migrations have not been applied to a database.
+`Migrations/20260809034530_InitialFlightTelemetrySchema.cs` creates `Flights`, `FlightTelemetryPoints`, and `FlightEvents`. `Migrations/20260809110000_AddFlightDuplicateLookupIndex.cs` adds the non-unique composite flight identity index. The migrations contain no seed data and have reversible `Down` operations. Run `dotnet run --project src/Hosts/Fip.DatabaseMigrator/Fip.DatabaseMigrator.csproj` after configuring the connection string to apply them.
 
 ## Future boundary
 

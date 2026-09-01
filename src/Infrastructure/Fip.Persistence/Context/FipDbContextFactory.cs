@@ -5,13 +5,11 @@ namespace Fip.Persistence.Context;
 
 public sealed class FipDbContextFactory : IDesignTimeDbContextFactory<FipDbContext>
 {
-    private const string DefaultDevelopmentConnectionString =
-        "Server=DESKTOP-BIRS3VI\\SQLEXPRESS;Database=FIP;Trusted_Connection=True;TrustServerCertificate=True;";
-
     public FipDbContext CreateDbContext(string[] args)
     {
         var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__ConnectionString-AppDb")
-            ?? DefaultDevelopmentConnectionString;
+            ?? throw new InvalidOperationException(
+                "The 'ConnectionStrings__ConnectionString-AppDb' environment variable must be configured for design-time database operations.");
 
         var optionsBuilder = new DbContextOptionsBuilder<FipDbContext>();
         optionsBuilder.UseSqlServer(

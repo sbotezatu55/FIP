@@ -1,16 +1,16 @@
 <section class="summary fip-panel" aria-labelledby="flight-summary-title">
   <div class="section-heading">
-    <h2 id="flight-summary-title">Flight Summary</h2>
+    <h2 id="flight-summary-title">Summary</h2>
     @if (summaryErrorMessage) { <p class="summary-error" role="status">{{ summaryErrorMessage }}</p> }
   </div>
 
   @if (summary) {
     <div class="summary-grid">
-      <article class="summary-card"><span>Duration</span><strong>{{ formatDuration(summary.duration || flight.duration) }}</strong></article>
-      <article class="summary-card"><span>Maximum Altitude</span><strong>{{ formatAltitude(summary.maximumAltitudeFeet ?? flight.maximumAltitudeFeet) }}</strong></article>
-      <article class="summary-card"><span>Distance</span><strong>{{ summary.distanceTraveledNauticalMiles | number: '1.0-0' }} nm</strong></article>
-      <article class="summary-card"><span>Maximum Groundspeed</span><strong>{{ summary.maximumGroundSpeedKnots === null ? '—' : (summary.maximumGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong></article>
-      <article class="summary-card"><span>Average Groundspeed</span><strong>{{ summary.averageGroundSpeedKnots === null ? '—' : (summary.averageGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong></article>
+      <article class="summary-card"><img class="summary-icon" src="/icons/fip/clock.svg" alt="" aria-hidden="true" /><div><span>Duration</span><strong>{{ formatDuration(summary.duration || flight.duration) }}</strong></div></article>
+      <article class="summary-card"><img class="summary-icon" src="/icons/fip/distance.svg" alt="" aria-hidden="true" /><div><span>Distance</span><strong>{{ summary.distanceTraveledNauticalMiles | number: '1.0-0' }} NM</strong></div></article>
+      <article class="summary-card"><img class="summary-icon" src="/icons/fip/altitude.svg" alt="" aria-hidden="true" /><div><span>Maximum Altitude</span><strong>{{ formatAltitude(summary.maximumAltitudeFeet ?? flight.maximumAltitudeFeet) }}</strong></div></article>
+      <article class="summary-card"><img class="summary-icon" src="/icons/fip/speed.svg" alt="" aria-hidden="true" /><div><span>Maximum Groundspeed</span><strong>{{ summary.maximumGroundSpeedKnots === null ? '—' : (summary.maximumGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong></div></article>
+      <article class="summary-card"><img class="summary-icon" src="/icons/fip/speed.svg" alt="" aria-hidden="true" /><div><span>Average Groundspeed</span><strong>{{ summary.averageGroundSpeedKnots === null ? '—' : (summary.averageGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong></div></article>
     </div>
   } @else if (!summaryErrorMessage) {
     <p class="status-message" role="status">Loading summary...</p>

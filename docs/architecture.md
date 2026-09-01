@@ -57,7 +57,7 @@ OpenSky JSON
 - `Fip.Api` composes Application, Infrastructure, Persistence, and Identity and starts an ASP.NET Core host.
 - `apps/fip-web` contains the standalone Angular frontend. A reusable root shell provides the sticky navigation and minimal footer around the public Index, Features, Technology, Flights, Flight Import, and Flight Detail routes. The Index page composes the dark FIP hero with the transparent `public/images/airframe-transparent.png` aircraft asset, live Recent Flights section, and flight-processing pipeline; reusable theme variables and the `FipIconComponent` SVG wrapper under `public/icons/fip/` support the rest of the application. It communicates with `Fip.Api` over HTTP/JSON through a development proxy.
 - `Fip.Worker` creates a hosted worker whose `ExecuteAsync` currently completes immediately.
-- `Fip.DatabaseMigrator` is an executable scaffold that prints that it is not configured.
+- `Fip.DatabaseMigrator` is an executable host that applies pending EF Core migrations through the configured SQL Server connection.
 - `Fip.Cli` is an executable scaffold that prints that it is not configured.
 
 ### Tests

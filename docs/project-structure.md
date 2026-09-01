@@ -43,7 +43,7 @@
 | `Fip.Domain` | Source-independent domain model. Currently contains `Fip.Domain.Flights.Telemetry.FlightTelemetryPoint`. | `Fip.SharedKernel` |
 | `Fip.Application` | Feature-oriented service/DTO shells and OpenSky import contract, DTO, and mapper. | `Fip.Domain`, `Fip.SharedKernel`, `Fip.Application.Abstractions`; DI abstractions package |
 | `Fip.Api` | ASP.NET Core host composition root. Calls all four DI extension methods and starts the application. | Application, Infrastructure, Persistence, Identity |
-| `Fip.DatabaseMigrator` | Executable scaffold that reports migration support is not configured. | Persistence |
+| `Fip.DatabaseMigrator` | Executable host that applies pending EF Core migrations using the configured SQL Server connection. | Persistence |
 | `Fip.Worker` | .NET Worker host with a `BackgroundService` whose work currently completes immediately. | Application, Infrastructure, Persistence; hosting package |
 | `Fip.Identity` | Identity DI composition root with no current registrations. | Application and Infrastructure abstractions; DI abstractions package |
 | `Fip.Infrastructure` | Concrete OpenSky JSON importer and Infrastructure DI registration. | Application, Application abstractions, Infrastructure abstractions; DI abstractions package |
@@ -74,7 +74,7 @@ The explicit package references currently present are:
 | `xunit` | `2.9.3` | All test projects |
 | `xunit.runner.visualstudio` | `3.1.4` | All test projects |
 
-The Web and Worker SDKs also provide their framework-level dependencies. No EF Core, database provider, AutoMapper, MediatR, or OpenAPI package is explicitly referenced.
+The Web and Worker SDKs also provide their framework-level dependencies. EF Core 10.0.9 and the SQL Server provider are explicitly referenced by `Fip.Persistence`; the migrator explicitly references EF Core and hosting packages. AutoMapper, MediatR, and OpenAPI are not referenced.
 
 ## Important namespaces and folders
 

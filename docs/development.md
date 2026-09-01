@@ -16,7 +16,15 @@ cd FIP
 dotnet restore FIP.sln
 ```
 
-The repository does not currently include a README-provided external service or database setup requirement.
+The repository does not require an external service for its core tests, but local API and migration-host development requires a reachable SQL Server database.
+
+For local API and migration-host development, configure a SQL Server connection string using the shared user-secrets store:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:ConnectionString-AppDb" "<local SQL Server connection string>" --project src/Hosts/Fip.Api/Fip.Api.csproj
+```
+
+The API and database migrator share the `fip-api-development` user-secrets ID. The equivalent environment variable is `ConnectionStrings__ConnectionString-AppDb`.
 
 ## Build
 
@@ -82,7 +90,7 @@ npm start
 
 The Angular development server proxies `/api/...` requests to the local API at `http://localhost:5271`. The frontend communicates with `Fip.Api` through HTTP/JSON; it does not reference .NET projects directly.
 
-Run the Worker, CLI, or DatabaseMigrator using their project paths if needed. They are currently scaffolds: the Worker completes its background operation immediately, while the CLI and migrator print that they are not configured.
+Run the Worker, CLI, or DatabaseMigrator using their project paths if needed. The Worker completes its background operation immediately and the CLI remains a scaffold. The DatabaseMigrator applies pending EF Core migrations using the configured SQL Server connection.
 
 ## Configuration
 
@@ -97,7 +105,7 @@ Worker configuration is in:
 - `src/Hosts/Fip.Worker/appsettings.json`
 - `src/Hosts/Fip.Worker/appsettings.Development.json`
 
-Current settings cover logging, allowed hosts, launch URLs, and environment selection. There are no database, authentication, or external OpenSky settings.
+Current settings cover logging, allowed hosts, launch URLs, environment selection, and the SQL Server connection string supplied through user secrets or environment configuration. Authentication and external OpenSky settings are not configured.
 
 ## Frontend architecture
 
@@ -134,4 +142,4 @@ The OpenSky integration fixture is `data/samples/opensky/TRA051_B738_2018-05-30.
 - The solution favors feature-oriented folders in Application and source-specific folders for OpenSky import code.
 - External DTOs remain outside Domain; normalized telemetry resides in Domain.
 - Tests are separated by architectural area.
-- No CQRS, MediatR, AutoMapper, EF Core, or database provider is currently used.
+- No CQRS, MediatR, AutoMapper, authentication, or OpenAPI package is currently used. EF Core with SQL Server is used by `Fip.Persistence`.

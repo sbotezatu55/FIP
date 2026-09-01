@@ -1,6 +1,6 @@
 # Flight Intelligence Platform
 
-Flight Intelligence Platform (FIP) is a .NET solution being built to ingest, normalize, analyze, and eventually persist flight and telemetry data. The repository currently contains the initial layered structure and an implemented OpenSky JSON trajectory import path.
+Flight Intelligence Platform (FIP) is a .NET solution being built to ingest, normalize, analyze, and persist flight and telemetry data. The repository currently contains the initial layered structure and an implemented OpenSky JSON trajectory import path.
 
 ## Current capabilities
 
@@ -57,7 +57,7 @@ flowchart LR
 - Microsoft.Extensions dependency injection abstractions
 - xUnit, Microsoft.NET.Test.Sdk, and coverlet for tests
 
-No database provider or EF Core dependency is currently configured.
+EF Core 10 with SQL Server is configured for flight, telemetry, and event persistence. Database migrations are applied through the `Fip.DatabaseMigrator` host.
 
 ## Solution structure
 
@@ -102,7 +102,7 @@ It provides public Index, Features, Technology, Privacy, Terms, and Contact page
 
 ## Development status
 
-The repository is at an early foundation stage. OpenSky ingestion and telemetry normalization are the most complete functional path. The source-independent `Flight` aggregate, basic in-memory `FlightReconstructor`, telemetry validation classification, telemetry gap detection, initial `FlightEvent` domain model, conservative takeoff, Top-of-Climb, Top-of-Descent, and landing detectors, common event-detection orchestration, initial deterministic flight-phase classification, and first read-only flight API endpoints are established. Other event detection algorithms, authentication, and production workflows remain to be implemented.
+The repository is at an early foundation stage. OpenSky ingestion and telemetry normalization are the most complete functional path. The source-independent `Flight` aggregate, EF Core persistence, basic in-memory `FlightReconstructor`, telemetry validation classification, telemetry gap detection, initial `FlightEvent` domain model, conservative takeoff, Top-of-Climb, Top-of-Descent, and landing detectors, common event-detection orchestration, initial deterministic flight-phase classification, and first flight API endpoints are established. Other event detection algorithms, authentication, background import workflows, and production hardening remain to be implemented.
 
 ## Documentation
 

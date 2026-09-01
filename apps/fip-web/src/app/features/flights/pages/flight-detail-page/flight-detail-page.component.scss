@@ -1,9 +1,12 @@
 :host { display: block; }
 
 .detail-page { padding: 2.5rem 0 4rem; }
-.back-link { display: inline-block; margin-bottom: 2rem; color: var(--fip-cyan); font-weight: 700; text-decoration: none; }
+.back-link { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; color: var(--fip-green); font-weight: 700; text-decoration: none; }
+.back-link__icon { color: inherit; font-size: 1.35rem; line-height: 1; }
 .back-link:hover { text-decoration: underline; }
 .flight-header { margin-bottom: 2.5rem; }
+.flight-header__topline { display: flex; align-items: center; justify-content: flex-start; gap: 1rem; margin-bottom: 0.85rem; }
+.flight-header__topline .fip-eyebrow { margin: 0; }
 .flight-title { margin: 0; color: var(--fip-text); font-size: clamp(1.45rem, 2vw, 2rem); letter-spacing: -0.03em; }
 
 .detail-page > app-flight-information,
@@ -27,4 +30,4 @@
 .primary-button:hover { background: var(--fip-green-soft); }
 
 @media (max-width: 850px) { .main-row { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .profile-row { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .flight-header__topline { align-items: flex-start; flex-direction: column-reverse; }.profile-row { grid-template-columns: 1fr; } }
