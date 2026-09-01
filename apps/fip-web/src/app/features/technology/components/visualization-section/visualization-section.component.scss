@@ -1,0 +1,4 @@
+.visual-list { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--fip-border); }
+.visual-list span { padding: 1.25rem 1rem; border-right: 1px solid var(--fip-border); color: var(--fip-text); font-size: 0.85rem; }
+.visual-list span::before { display: block; width: 2rem; height: 2px; margin-bottom: 1rem; background: var(--fip-cyan); content: ''; }
+@media (max-width: 750px) { .visual-list { grid-template-columns: 1fr 1fr; } .visual-list span { border-bottom: 1px solid var(--fip-border); } .visual-list span:last-child { grid-column: span 2; } }

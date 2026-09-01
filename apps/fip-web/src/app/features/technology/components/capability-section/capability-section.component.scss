@@ -1,0 +1,8 @@
+.capabilities { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.capabilities article { padding: 1.5rem; border: 1px solid var(--fip-border); background: var(--fip-surface); }
+h3 { margin: 0 0 0.8rem; color: var(--fip-green); font-size: 1.05rem; }
+p, li { color: var(--fip-text-secondary); font-size: 0.92rem; }
+.capabilities p { margin: 0 0 1rem; }
+.capabilities p:last-child { margin: 0; }
+.capabilities ul { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; padding-left: 1.1rem; margin: 0; }
+@media (max-width: 750px) { .capabilities { grid-template-columns: 1fr; } }

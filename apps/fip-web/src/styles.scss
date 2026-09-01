@@ -85,6 +85,93 @@ textarea {
   letter-spacing: -0.03em;
 }
 
+.fip-info-page {
+  max-width: 860px;
+  padding: clamp(2.75rem, 5vw, 3.5rem) 0 5rem;
+}
+
+.fip-info-header {
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--fip-border);
+}
+
+.fip-info-header h1 {
+  max-width: 760px;
+  margin: 0 0 1rem;
+  color: var(--fip-text);
+  font-size: clamp(2rem, 4vw, 2.625rem);
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.fip-info-intro {
+  max-width: 720px;
+  margin: 0;
+  color: var(--fip-text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.fip-info-meta {
+  margin: 1rem 0 0;
+  color: var(--fip-text-muted);
+  font-size: 0.85rem;
+}
+
+.fip-info-content {
+  padding-top: 2.5rem;
+}
+
+.fip-info-content section {
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--fip-border);
+}
+
+.fip-info-content section:first-child {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+}
+
+.fip-info-content h2 {
+  margin: 0 0 0.75rem;
+  color: var(--fip-text);
+  font-size: 1.25rem;
+}
+
+.fip-info-content p,
+.fip-info-content li {
+  color: var(--fip-text-secondary);
+  line-height: 1.7;
+}
+
+.fip-info-content p:last-child {
+  margin-bottom: 0;
+}
+
+.fip-info-content ul {
+  padding-left: 1.25rem;
+}
+
+.fip-info-content a {
+  color: var(--fip-cyan);
+}
+
+@media (max-width: 700px) {
+  .fip-info-page {
+    padding-top: 2.5rem;
+  }
+
+  .fip-info-header {
+    padding-bottom: 2.25rem;
+  }
+
+  .fip-info-header h1 {
+    font-size: clamp(1.75rem, 8vw, 2rem);
+  }
+}
+
 .fip-panel {
   border: 1px solid var(--fip-border);
   border-radius: var(--fip-radius-md);
@@ -124,106 +211,4 @@ textarea {
 .fip-button--secondary:hover {
   border-color: var(--fip-cyan-soft);
   color: var(--fip-cyan);
-}
-
-/* Shared compatibility surface for existing feature pages. */
-.page-header h1,
-.flight-header h1,
-.status-panel h1,
-.detail-page h1,
-.import-page h1,
-.flights-page h1 {
-  color: var(--fip-text);
-}
-
-.page-header > p:last-child,
-.flight-identifier,
-.section-subtitle,
-.status-message,
-.status-panel,
-.file-hint,
-.selected-file,
-.status-detail {
-  color: var(--fip-text-secondary);
-}
-
-.eyebrow,
-.back-link,
-.view-link,
-.result-link {
-  color: var(--fip-cyan);
-}
-
-.table-container,
-.import-card,
-.status-message,
-.status-panel,
-.dashboard-section,
-.summary-card {
-  border-color: var(--fip-border);
-  background: var(--fip-surface);
-  box-shadow: none;
-}
-
-.table-container th {
-  background: var(--fip-surface-alt);
-  color: var(--fip-text-muted);
-}
-
-.table-container td {
-  border-color: var(--fip-border-soft);
-  color: var(--fip-text-secondary);
-}
-
-.table-container tbody tr:hover {
-  background: var(--fip-surface-alt);
-}
-
-.primary-button,
-.secondary-button {
-  border-color: transparent;
-  border-radius: var(--fip-radius-sm);
-  font-weight: 700;
-}
-
-.primary-button {
-  background: var(--fip-green);
-  color: var(--fip-bg-deep);
-}
-
-.primary-button:hover {
-  background: var(--fip-green-soft);
-}
-
-.secondary-button {
-  border-color: var(--fip-border);
-  background: var(--fip-surface-alt);
-  color: var(--fip-text);
-}
-
-.secondary-button:hover {
-  border-color: var(--fip-cyan-soft);
-  color: var(--fip-cyan);
-}
-
-input[type='file'] {
-  border-color: var(--fip-border);
-  background: var(--fip-bg-deep);
-  color: var(--fip-text-secondary);
-}
-
-.progress-panel,
-.result-panel {
-  border-color: var(--fip-border);
-  background: var(--fip-surface-alt);
-}
-
-.progress-panel h2,
-.status-heading,
-.result-panel h2,
-.result-panel p,
-.file-field label,
-.selected-file strong,
-.status-panel h2 {
-  color: var(--fip-text);
 }

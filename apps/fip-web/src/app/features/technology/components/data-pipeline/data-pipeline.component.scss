@@ -1,0 +1,6 @@
+.pipeline { display: flex; align-items: stretch; gap: 0.45rem; overflow: hidden; padding: 1rem; border: 1px solid var(--fip-border); background: var(--fip-bg-deep); }
+.pipeline-step { display: flex; flex: 1; min-width: 6rem; flex-direction: column; justify-content: space-between; gap: 1rem; padding: 0.8rem; border-left: 2px solid var(--fip-green); }
+.pipeline-step span { color: var(--fip-cyan); font-size: 0.7rem; }
+.pipeline-step strong { font-size: 0.7rem; letter-spacing: 0.06em; line-height: 1.3; }
+.pipeline i { align-self: center; color: var(--fip-cyan); font-style: normal; }
+@media (max-width: 850px) { .pipeline { flex-direction: column; } .pipeline i { transform: rotate(90deg); } .pipeline-step { min-height: 3.5rem; flex-direction: row; align-items: center; } }

@@ -1,0 +1,7 @@
+:host { display: block; }
+
+.profile-section { padding: 1.35rem; }
+.section-heading h2 { margin: 0 0 0.5rem; }
+.section-subtitle { margin: 0 0 1.25rem; color: var(--fip-text-secondary); }
+.status-message { margin: 0; padding: 1.35rem; border: 1px solid var(--fip-border); border-radius: var(--fip-radius-md); background: var(--fip-surface); color: var(--fip-text-secondary); }
+.status-message--error { color: var(--fip-danger); }

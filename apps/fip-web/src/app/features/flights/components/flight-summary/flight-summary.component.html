@@ -1,0 +1,18 @@
+<section class="summary fip-panel" aria-labelledby="flight-summary-title">
+  <div class="section-heading">
+    <h2 id="flight-summary-title">Flight Summary</h2>
+    @if (summaryErrorMessage) { <p class="summary-error" role="status">{{ summaryErrorMessage }}</p> }
+  </div>
+
+  @if (summary) {
+    <div class="summary-grid">
+      <article class="summary-card"><span>Duration</span><strong>{{ formatDuration(summary.duration || flight.duration) }}</strong></article>
+      <article class="summary-card"><span>Maximum Altitude</span><strong>{{ formatAltitude(summary.maximumAltitudeFeet ?? flight.maximumAltitudeFeet) }}</strong></article>
+      <article class="summary-card"><span>Distance</span><strong>{{ summary.distanceTraveledNauticalMiles | number: '1.0-0' }} nm</strong></article>
+      <article class="summary-card"><span>Maximum Groundspeed</span><strong>{{ summary.maximumGroundSpeedKnots === null ? '—' : (summary.maximumGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong></article>
+      <article class="summary-card"><span>Average Groundspeed</span><strong>{{ summary.averageGroundSpeedKnots === null ? '—' : (summary.averageGroundSpeedKnots | number: '1.0-0') + ' kt' }}</strong></article>
+    </div>
+  } @else if (!summaryErrorMessage) {
+    <p class="status-message" role="status">Loading summary...</p>
+  }
+</section>

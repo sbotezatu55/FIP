@@ -98,7 +98,7 @@ npm install
 npm start
 ```
 
-It provides the Index, Flights, and Flight Detail routes and proxies `/api/...` requests to the local API.
+It provides public Index, Features, Technology, Privacy, Terms, and Contact pages plus Flights and Flight Detail routes, and proxies `/api/...` requests to the local API.
 
 ## Development status
 

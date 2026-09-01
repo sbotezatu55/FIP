@@ -13,6 +13,6 @@ tbody tr:hover { background: var(--fip-surface-alt); }
 .callsign a:hover { color: var(--fip-green); }
 .route { color: var(--fip-text); }
 .route span { padding: 0 0.3rem; color: var(--fip-green); }
-.status-panel { display: flex; flex-direction: column; gap: 0.35rem; padding: 1.5rem; color: var(--fip-text-secondary); }
+.status-panel { display: flex; flex-direction: column; gap: 0.35rem; padding: 1.5rem; border: 1px solid var(--fip-border); border-radius: var(--fip-radius-md); background: var(--fip-surface); color: var(--fip-text-secondary); }
 .status-panel strong { color: var(--fip-text); }
 @media (max-width: 720px) { .section-heading { align-items: flex-start; flex-direction: column; } .recent-flights { padding: 1rem 0 2.5rem; /* Keep the Flight Activity section higher on smaller screens. */ } }

@@ -1,0 +1,1 @@
+<div class="pipeline" aria-label="Flight data processing pipeline">@for (step of steps; track step; let last = $last) {<div class="pipeline-step"><span>{{ $index + 1 | number:'2.0-0' }}</span><strong>{{ step }}</strong></div>@if (!last) {<i aria-hidden="true">→</i>}}</div>

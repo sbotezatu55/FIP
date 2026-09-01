@@ -1,0 +1,22 @@
+.technology-page { padding-bottom: 5rem; }
+.technology-hero { position: relative; padding: clamp(2.75rem, 5vw, 3.5rem) 0 clamp(2.5rem, 4vw, 3rem); border-bottom: 1px solid var(--fip-border); overflow: hidden; }
+.technology-hero::after { position: absolute; right: -10%; bottom: 1.5rem; width: 45%; height: 1px; background: var(--fip-green); opacity: .45; content: ''; transform: rotate(-8deg); }
+.technology-hero h1 { max-width: 760px; margin: 0; font-size: clamp(2rem, 4vw, 2.625rem); letter-spacing: -.045em; line-height: 1.08; text-transform: uppercase; }
+.technology-hero h1 strong { color: var(--fip-green); font-weight: 800; }
+.hero-intro { max-width: 780px; margin: 1.25rem 0 1.5rem; color: var(--fip-text-secondary); font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.6; }
+.technology-hero .hero-line { display: flex; flex-wrap: wrap; align-items: center; margin: 0; color: var(--fip-cyan); font-size: .72rem; font-weight: 800; letter-spacing: .14em; }
+.hero-line span { padding: 0 .65rem; color: var(--fip-green); }
+.page-section { padding: clamp(3.5rem, 7vw, 6rem) 0 0; }
+.section-heading { max-width: 760px; margin-bottom: 2rem; }
+.section-heading p:last-child, .section-note, .closing-section > p:not(.fip-eyebrow):not(.hero-line) { color: var(--fip-text-secondary); }
+.section-heading p:last-child { margin: .75rem 0 0; }
+.section-note { max-width: 850px; margin: 1.5rem 0 0; }
+.organization-grid { display: flex; flex-wrap: wrap; gap: 1px; border: 1px solid var(--fip-border); background: var(--fip-border); }
+.organization-grid span { flex: 1 1 9rem; padding: 1.2rem; background: var(--fip-surface); color: var(--fip-green); font-size: .85rem; font-weight: 700; }
+.engineering-line { padding: 1.25rem; border: 1px solid var(--fip-border); background: var(--fip-bg-deep); color: var(--fip-text); font-size: .72rem; font-weight: 800; letter-spacing: .08em; line-height: 2.2; }
+.engineering-line span { padding: 0 .4rem; color: var(--fip-cyan); }
+.closing-section { padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 5vw, 5rem); margin-top: 6rem; border: 1px solid var(--fip-border); background: var(--fip-surface); text-align: center; }
+.closing-section h2 { margin: 0 0 1rem; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.05em; }
+.closing-section > p:not(.fip-eyebrow):not(.hero-line) { max-width: 760px; margin: 0 auto 2rem; }
+.closing-line { margin-bottom: 2rem; }
+@media (max-width: 700px) { .technology-hero { padding: 2.5rem 0 2.25rem; }.technology-hero h1 { font-size: clamp(1.75rem, 8vw, 2rem); }.technology-hero .hero-line { line-height: 2.1; }.technology-hero .hero-line span { padding: 0 .25rem; }.closing-section { text-align: left; }.closing-section .closing-line { text-align: left; }.closing-section .fip-button { width: 100%; } }

@@ -1,0 +1,7 @@
+.roadmap { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.roadmap span { padding: 0.7rem 0.9rem; border: 1px dashed var(--fip-border); color: var(--fip-text-secondary); font-size: 0.85rem; }
+.ai-note { max-width: 900px; padding: 1.5rem; margin-top: 2rem; border-left: 2px solid var(--fip-warning); background: rgb(214 168 66 / 5%); }
+.ai-note .status { color: var(--fip-warning); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; }
+.ai-note h3 { margin: 0.8rem 0 0.7rem; }
+.ai-note p { color: var(--fip-text-secondary); font-size: 0.92rem; }
+.ai-note p:last-child { margin-bottom: 0; }

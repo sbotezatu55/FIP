@@ -1,0 +1,5 @@
+.technology-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; border: 1px solid var(--fip-border); background: var(--fip-border); }
+.tech-item { display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; min-height: 10rem; padding: 1.4rem; background: var(--fip-surface); }
+.tech-symbol { display: grid; place-items: center; width: 2.65rem; height: 2.65rem; border: 1px solid var(--fip-cyan-soft); color: var(--fip-cyan); font-size: 0.7rem; font-weight: 800; }
+.tech-item h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+.tech-item p { margin: 0; color: var(--fip-text-secondary); font-size: 0.9rem; }

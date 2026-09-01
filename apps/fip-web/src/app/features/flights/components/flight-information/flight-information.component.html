@@ -1,0 +1,11 @@
+<section class="information fip-panel" aria-labelledby="flight-information-title">
+  <h2 id="flight-information-title" class="box-title">Flight Information</h2>
+  <div class="information-grid">
+    <div class="information-item"><dl><dt>Callsign</dt><dd>{{ flight.callsign || '—' }}</dd></dl></div>
+    <div class="information-item"><dl><dt>ICAO24</dt><dd>{{ flight.icao24 }}</dd></dl></div>
+    <div class="information-item"><dl><dt>Start</dt><dd>{{ flight.startTime | date: 'medium' }}</dd></dl></div>
+    <div class="information-item"><dl><dt>End</dt><dd>{{ flight.endTime | date: 'medium' }}</dd></dl></div>
+    <div class="information-item"><dl><dt>Departure Position</dt><dd>{{ formatPosition(flight.departureLatitude, flight.departureLongitude) }}</dd></dl></div>
+    <div class="information-item"><dl><dt>Arrival Position</dt><dd>{{ formatPosition(flight.arrivalLatitude, flight.arrivalLongitude) }}</dd></dl></div>
+  </div>
+</section>

@@ -1,0 +1,11 @@
+/* Contact uses the shared informational-page layout. */
+.contact-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.contact-line img {
+  display: block;
+}

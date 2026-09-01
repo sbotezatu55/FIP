@@ -1,0 +1,6 @@
+.quality-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--fip-border); border: 1px solid var(--fip-border); }
+.quality-grid article { display: flex; flex-direction: column; gap: 0.7rem; padding: 1.2rem; background: var(--fip-surface); }
+.quality-grid b { color: var(--fip-green); font-size: 0.9rem; }
+.quality-grid span { color: var(--fip-text-secondary); font-size: 0.82rem; }
+@media (max-width: 850px) { .quality-grid { grid-template-columns: repeat(2, 1fr); } .quality-grid article:last-child { grid-column: span 2; } }
+@media (max-width: 500px) { .quality-grid { grid-template-columns: 1fr; } .quality-grid article:last-child { grid-column: auto; } }

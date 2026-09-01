@@ -1,0 +1,40 @@
+<div class="technology-page fip-page">
+  <header class="technology-hero" aria-labelledby="technology-title">
+    <p class="fip-eyebrow">Technology</p>
+    <h1 id="technology-title">Engineering the <strong>Flight Intelligence Platform</strong></h1>
+    <p class="hero-intro">FIP is built as a modular aviation software platform using modern .NET and web technologies, with clear separation between aviation domain logic, data processing, infrastructure, APIs, and presentation.</p>
+    <p class="hero-line" aria-label="Domain to application to infrastructure to API to web">DOMAIN <span>→</span> APPLICATION <span>→</span> INFRASTRUCTURE <span>→</span> API <span>→</span> WEB</p>
+  </header>
+
+  <div>
+    <section class="page-section" aria-labelledby="architecture-title">
+      <div class="section-heading"><p class="fip-eyebrow">01 / Foundation</p><h2 id="architecture-title" class="fip-section-title">Platform Architecture</h2><p>FIP follows a layered architecture designed to keep aviation domain logic independent from infrastructure, persistence, APIs, and presentation.</p></div>
+      <app-architecture-flow />
+      <p class="section-note">This separation allows flight reconstruction, event detection, and analytical algorithms to evolve independently from the user interface or the source of the flight data. The architecture is intentionally designed to support additional data sources, analytical engines, and aviation use cases over time.</p>
+    </section>
+
+    <section class="page-section" aria-labelledby="core-technology-title">
+      <div class="section-heading"><p class="fip-eyebrow">02 / Stack</p><h2 id="core-technology-title" class="fip-section-title">Core Technology</h2></div>
+      <app-technology-grid />
+    </section>
+
+    <section class="page-section" aria-labelledby="pipeline-title">
+      <div class="section-heading"><p class="fip-eyebrow">03 / Processing</p><h2 id="pipeline-title" class="fip-section-title">From Flight Data to Intelligence</h2><p>At the center of FIP is a processing pipeline that converts external flight observations into a consistent internal representation that can be reconstructed and analyzed.</p></div>
+      <app-data-pipeline />
+      <p class="section-note">Instead of designing the application around a particular ADS-B or telemetry format, incoming information is translated into a common flight model. This allows analytical logic to remain independent from individual data providers.</p>
+    </section>
+
+    <section class="page-section" aria-labelledby="organization-title"><div class="section-heading"><p class="fip-eyebrow">04 / Solution organization</p><h2 id="organization-title" class="fip-section-title">Solution Organization</h2><p>The repository is organized into clear architectural groups: BuildingBlocks contains shared contracts and primitives; Core contains Domain and Application logic; Infrastructure contains concrete integrations and Persistence; Hosts contains Api, Worker, and DatabaseMigrator; Tools contains the Cli.</p></div><div class="organization-grid"><span>BuildingBlocks</span><span>Core</span><span>Infrastructure</span><span>Hosts</span><span>Tools</span></div></section>
+    <section class="page-section" aria-labelledby="adapter-title"><div class="section-heading"><p class="fip-eyebrow">05 / Boundaries</p><h2 id="adapter-title" class="fip-section-title">Data-Source Architecture</h2><p>External data providers are integrated without coupling the domain model to provider-specific formats.</p></div><div class="architecture-flow adapter-flow"><span>EXTERNAL SOURCE</span><i>↓</i><span>SOURCE ADAPTER</span><i>↓</i><span>NORMALIZATION</span><i>↓</i><span>COMMON FLIGHT MODEL</span><i>↓</i><span>DOMAIN / ANALYTICS</span></div><p class="section-note">OpenSky is the current example. Future adapters can be introduced without redesigning the core analytical model.</p></section>
+    <section class="page-section" aria-labelledby="processing-title"><div class="section-heading"><p class="fip-eyebrow">06 / Responsibility</p><h2 id="processing-title" class="fip-section-title">Processing Pipeline</h2><p>Each stage has a separate engineering responsibility, allowing source handling, validation, domain processing, persistence, and presentation to evolve independently.</p></div><div class="engineering-line">SOURCE <span>→</span> IMPORTER <span>→</span> VALIDATION <span>→</span> NORMALIZATION <span>→</span> DOMAIN PROCESSING <span>→</span> PERSISTENCE <span>→</span> API <span>→</span> WEB</div></section>
+    <section class="page-section" aria-labelledby="testing-title"><div class="section-heading"><p class="fip-eyebrow">07 / Confidence</p><h2 id="testing-title" class="fip-section-title">Testing Strategy</h2><p>FIP is structured so domain behavior and flight-processing logic can be tested independently from infrastructure and presentation.</p></div><div class="organization-grid"><span>Unit testing</span><span>Application-level tests</span><span>Integration testing</span><span>Real-flight dataset testing</span><span>API testing</span></div></section>
+    <section class="page-section" aria-labelledby="diagnostics-title"><div class="section-heading"><p class="fip-eyebrow">08 / Visibility</p><h2 id="diagnostics-title" class="fip-section-title">Diagnostics &amp; Observability</h2><p>Import diagnostics expose records processed, rejected records, warnings, timing, and source information. These signals make flight-data processing easier to inspect and verify.</p></div></section>
+    <section class="page-section" aria-labelledby="evolution-title"><div class="section-heading"><p class="fip-eyebrow">09 / Planned / exploratory</p><h2 id="evolution-title" class="fip-section-title">Technology Evolution</h2><p>Potential future technology direction includes additional data-provider adapters, simulation SDK integrations, SimConnect, AI/ML integration architecture, external aviation-data services, cloud deployment, and scalable telemetry processing.</p></div></section>
+
+    <section class="closing-section" aria-labelledby="closing-title">
+      <p class="fip-eyebrow">The direction</p><h2 id="closing-title">Built to Evolve</h2>
+      <p>The architecture of FIP is designed so new data sources, analytical algorithms, and user experiences can be added without tightly coupling them to the rest of the platform.</p>
+      <p class="hero-line closing-line">DATA SOURCES <span>→</span> DOMAIN MODEL <span>→</span> ANALYTICAL SERVICES <span>→</span> API <span>→</span> EXPERIENCES</p>
+    </section>
+  </div>
+</div>

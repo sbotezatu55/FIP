@@ -7,10 +7,10 @@
       </a>
 
       <nav class="app-nav" aria-label="Main navigation">
+        <a routerLink="/" routerLinkActive="app-nav__link--active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
         <a routerLink="/flights" routerLinkActive="app-nav__link--active">Flights</a>
-        <a routerLink="/" fragment="about">About</a>
-        <a routerLink="/" fragment="features">Features</a>
-        <a routerLink="/" fragment="technology">Technology</a>
+        <a routerLink="/features" routerLinkActive="app-nav__link--active">Features</a>
+        <a routerLink="/technology" routerLinkActive="app-nav__link--active">Technology</a>
       </nav>
 
       <a class="app-github" href="https://github.com/sbotezatu55/FIP" target="_blank" rel="noopener noreferrer" aria-label="Open FIP on GitHub">
@@ -27,9 +27,9 @@
     <div class="app-footer__inner">
       <span>© {{ currentYear }} Flight Intelligence Platform</span>
       <nav aria-label="Footer navigation">
-        <a href="#" (click)="$event.preventDefault()">Privacy</a>
-        <a href="#" (click)="$event.preventDefault()">Terms</a>
-        <a href="mailto:contact@flightintelligence.platform">Contact</a>
+        <a routerLink="/privacy">Privacy</a>
+        <a routerLink="/terms">Terms</a>
+        <a routerLink="/contact">Contact</a>
       </nav>
     </div>
   </footer>

@@ -1,4 +1,3 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -6,17 +5,21 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { FlightDetail } from '../../models/flight-detail';
 import { FlightSummary } from '../../models/flight-summary';
 import { FlightTelemetryPoint } from '../../models/flight-telemetry-point';
+import { FlightEvent } from '../../models/flight-event';
 import { FlightsApiService } from '../../services/flights-api.service';
+import { FlightEventTimelineComponent } from '../../components/flight-event-timeline/flight-event-timeline.component';
+import { FlightInformationComponent } from '../../components/flight-information/flight-information.component';
+import { FlightSummaryComponent } from '../../components/flight-summary/flight-summary.component';
+import { FlightAnalysisComponent } from '../../components/flight-analysis/flight-analysis.component';
+import { FlightProfileSectionComponent } from '../../components/flight-profile-section/flight-profile-section.component';
 import { TrajectoryMapComponent } from '../../components/trajectory-map/trajectory-map.component';
 import { AltitudeChartComponent } from '../../components/altitude-chart/altitude-chart.component';
 import { GroundspeedChartComponent } from '../../components/groundspeed-chart/groundspeed-chart.component';
 import { VerticalRateChartComponent } from '../../components/vertical-rate-chart/vertical-rate-chart.component';
-import { FlightEventTimelineComponent } from '../../components/flight-event-timeline/flight-event-timeline.component';
-import { FlightEvent } from '../../models/flight-event';
 
 @Component({
   selector: 'app-flight-detail-page',
-  imports: [DatePipe, DecimalPipe, RouterLink, TrajectoryMapComponent, AltitudeChartComponent, GroundspeedChartComponent, VerticalRateChartComponent, FlightEventTimelineComponent],
+  imports: [RouterLink, FlightInformationComponent, FlightSummaryComponent, FlightAnalysisComponent, FlightProfileSectionComponent, FlightEventTimelineComponent, TrajectoryMapComponent, AltitudeChartComponent, GroundspeedChartComponent, VerticalRateChartComponent],
   templateUrl: './flight-detail-page.component.html',
   styleUrl: './flight-detail-page.component.scss'
 })
@@ -55,33 +58,21 @@ export class FlightDetailPageComponent {
     let summaryFailed = false;
 
     forkJoin({
-      detail: this.flightsApi.getFlight(id).pipe(
-        catchError((error: HttpErrorResponse) => {
-          detailError = error;
-          return of(null);
-        })
-      ),
-      summary: this.flightsApi.getFlightSummary(id).pipe(
-        catchError(() => {
-          summaryFailed = true;
-          return of(null);
-        })
-      )
+      detail: this.flightsApi.getFlight(id).pipe(catchError((error: HttpErrorResponse) => {
+        detailError = error;
+        return of(null);
+      })),
+      summary: this.flightsApi.getFlightSummary(id).pipe(catchError(() => {
+        summaryFailed = true;
+        return of(null);
+      }))
     }).subscribe({
       next: ({ detail, summary }) => {
         this.flight = detail;
         this.summary = summary;
-
-        if (detailError?.status === 404) {
-          this.notFound = true;
-        } else if (!detail) {
-          this.errorMessage = 'Unable to load flight details.';
-        }
-
-        if (summaryFailed && detail) {
-          this.summaryErrorMessage = 'Flight summary is unavailable.';
-        }
-
+        if (detailError?.status === 404) this.notFound = true;
+        else if (!detail) this.errorMessage = 'Unable to load flight details.';
+        if (summaryFailed && detail) this.summaryErrorMessage = 'Flight summary is unavailable.';
         this.isLoading = false;
         this.changeDetector.markForCheck();
       },
@@ -117,31 +108,6 @@ export class FlightDetailPageComponent {
         this.changeDetector.markForCheck();
       }
     });
-  }
-
-  formatDuration(duration: string | null | undefined): string {
-    if (!duration) return '—';
-
-    const parts = duration.split(':').map(Number);
-    if (parts.length !== 3 || parts.some(Number.isNaN)) return duration;
-
-    const [hours, minutes, seconds] = parts;
-    const values: string[] = [];
-    if (hours > 0) values.push(`${hours}h`);
-    if (minutes > 0 || hours > 0) values.push(`${minutes}m`);
-    if (hours === 0 && minutes === 0) values.push(`${seconds}s`);
-
-    return values.join(' ');
-  }
-
-  formatPosition(latitude: number | null, longitude: number | null): string {
-    return latitude === null || longitude === null
-      ? '—'
-      : `${latitude}, ${longitude}`;
-  }
-
-  formatAltitude(altitude: number | null): string {
-    return altitude === null ? '—' : `${altitude.toLocaleString('en-US')} ft`;
   }
 
   private isGuid(value: string): boolean {

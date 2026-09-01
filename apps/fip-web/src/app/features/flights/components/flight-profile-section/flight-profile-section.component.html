@@ -1,0 +1,13 @@
+<section class="profile-section fip-panel" [attr.aria-label]="title">
+  <div class="section-heading">
+    <h2>{{ title }}</h2>
+    <p class="section-subtitle">{{ subtitle }}</p>
+  </div>
+  @if (loading) {
+    <p class="status-message" role="status">Loading {{ title.toLowerCase() }}...</p>
+  } @else if (errorMessage) {
+    <p class="status-message status-message--error" role="alert">{{ errorMessage }}</p>
+  } @else {
+    <ng-content />
+  }
+</section>

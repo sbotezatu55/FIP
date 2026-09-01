@@ -1,189 +1,30 @@
-.detail-page {
-  padding: 2.5rem 0 4rem;
-}
+:host { display: block; }
 
-.back-link {
-  display: inline-block;
-  margin-bottom: 2rem;
-  color: #1b6ca8;
-  font-weight: 700;
-  text-decoration: none;
-}
+.detail-page { padding: 2.5rem 0 4rem; }
+.back-link { display: inline-block; margin-bottom: 2rem; color: var(--fip-cyan); font-weight: 700; text-decoration: none; }
+.back-link:hover { text-decoration: underline; }
+.flight-header { margin-bottom: 2.5rem; }
+.flight-title { margin: 0; color: var(--fip-text); font-size: clamp(1.45rem, 2vw, 2rem); letter-spacing: -0.03em; }
 
-.back-link:hover {
-  text-decoration: underline;
-}
+.detail-page > app-flight-information,
+.detail-page > app-flight-summary,
+.detail-page > app-flight-profile-section,
+.profile-row,
+.main-row { margin-bottom: 2rem; }
 
-.flight-title {
-  margin: 0;
-  color: var(--fip-text);
-  font-size: clamp(1.45rem, 2vw, 2rem);
-  letter-spacing: -0.03em;
-}
+.main-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 2rem; align-items: start; }
+.sidebar { display: grid; gap: 2rem; }
+.events-section { padding: 1.35rem; }
+.events-section h2 { margin: 0 0 1rem; }
+.status-message { margin: 0; padding: 1.35rem; border: 1px solid var(--fip-border); border-radius: var(--fip-radius-md); background: var(--fip-surface); color: var(--fip-text-secondary); }
+.status-message--error { color: var(--fip-danger); }
 
-.flight-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2.5rem;
-}
+.profile-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; }
+.status-panel { padding: 1.35rem; margin-bottom: 2rem; }
+.status-panel h1 { margin-top: 0; }
+.status-panel p { color: var(--fip-text-secondary); }
+.primary-button { display: inline-block; margin-top: 1rem; padding: 0.8rem 1.1rem; border-radius: var(--fip-radius-sm); background: var(--fip-green); color: var(--fip-bg-deep); font-weight: 750; text-decoration: none; }
+.primary-button:hover { background: var(--fip-green-soft); }
 
-.eyebrow {
-  margin: 0 0 0.75rem;
-  color: #1b6ca8;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.flight-identifier {
-  margin-bottom: 0;
-  color: #526579;
-  font-weight: 600;
-}
-
-.dashboard-section {
-  padding: 1.35rem;
-  border: 1px solid var(--fip-border);
-  border-radius: var(--fip-radius-md);
-  background: var(--fip-surface);
-  margin-bottom: 2.5rem;
-}
-
-.trajectory-section {
-  margin-top: 3rem;
-}
-
-.events-section {
-  width: 100%;
-}
-
-.information-grid,
-.summary-grid,
-.future-grid {
-  display: grid;
-  /* gap: 1rem; */
-}
-
-.information-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
- /* padding: 1rem; */
-  border: 0px solid var(--fip-border);
-  border-radius: var(--fip-radius-md);
-/*  background: var(--fip-surface-alt);*/
-}
-
-.information-item {
-  padding: 0.75rem;
-}
-
-dt,
-.summary-card span {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--fip-text-muted);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-dd {
-  margin: 0;
-  color: #ffffff;
-  font-weight: 650;
-}
-
-.summary-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.summary-card,
-.future-card,
-.status-panel,
-.status-message {
-  padding: 1.35rem;
-  border: px solid var(--fip-border);
-  border-radius: var(--fip-radius-md);
-  background: var(--fip-surface-alt);
-}
-
-.summary-card strong {
-  display: block;
-  color: #12304a;
-  font-size: 1.45rem;
-}
-
-.section-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.summary-error {
-  margin-bottom: 1.25rem;
-  color: #8b2d2d;
-}
-
-.section-subtitle {
-  margin: -0.75rem 0 1.25rem;
-  color: #526579;
-}
-
-.status-message--error {
-  color: #8b2d2d;
-}
-
-.future-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.future-card h2 {
-  margin-bottom: 0.5rem;
-  font-size: 1.05rem;
-}
-
-.future-card p,
-.status-panel p:last-of-type,
-.status-message {
-  margin-bottom: 0;
-  color: #526579;
-}
-
-.status-panel h1 {
-  font-size: 2rem;
-}
-
-.primary-button {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.8rem 1.1rem;
-  border-radius: 0.4rem;
-  background: #1b6ca8;
-  color: #ffffff;
-  font-weight: 750;
-  text-decoration: none;
-}
-
-@media (max-width: 850px) {
-  .information-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .future-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .information-grid,
-  .summary-grid,
-  .future-grid {
-    grid-template-columns: 1fr;
-  }
-}
+@media (max-width: 850px) { .main-row { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .profile-row { grid-template-columns: 1fr; } }

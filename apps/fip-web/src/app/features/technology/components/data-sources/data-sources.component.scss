@@ -1,0 +1,11 @@
+.source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.source-grid article { padding: 1.5rem; border: 1px solid var(--fip-border); background: var(--fip-surface); }
+.source-current { border-top: 2px solid var(--fip-green) !important; }
+.source-future { border-top: 2px solid var(--fip-warning) !important; }
+.status { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; color: var(--fip-green); }
+.source-future .status { color: var(--fip-warning); }
+h3 { margin: 0.8rem 0 0.5rem; font-size: 1.25rem; }
+.source-grid p, .source-grid li { color: var(--fip-text-secondary); font-size: 0.92rem; }
+.source-grid p { margin: 0; }
+.source-grid ul { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem 1.5rem; padding-left: 1.1rem; margin: 1rem 0 0; }
+@media (max-width: 700px) { .source-grid { grid-template-columns: 1fr; } .source-grid ul { grid-template-columns: 1fr; } }

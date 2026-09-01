@@ -82,7 +82,8 @@ describe('FlightDetailPageComponent', () => {
     expect(flightsApi.getFlightTelemetry).toHaveBeenCalledWith(flightId);
     expect(flightsApi.getFlightEvents).toHaveBeenCalledWith(flightId);
     expect(element.textContent).toContain('TRA051');
-    expect(element.textContent).toContain('ICAO24 484506');
+    expect(element.textContent).toContain('ICAO24');
+    expect(element.textContent).toContain('484506');
     expect(element.textContent).toContain('2h 33m');
     expect(element.textContent).toContain('37,000 ft');
     expect(element.textContent).toContain('1,124 nm');
