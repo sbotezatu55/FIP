@@ -60,18 +60,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fip.IntegrationTests", "tests\Fip.IntegrationTests\Fip.IntegrationTests.csproj", "{42A29172-3B61-477C-B184-8DD8EF62D4F0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "opensky", "opensky", "{966260DD-EFB3-4EE8-BB0D-5361D2003315}"
-	ProjectSection(SolutionItems) = preProject
-		C:\Users\sorin\Desktop\Fip.Resources\TRA051_B738_2018-05-30.json = C:\Users\sorin\Desktop\Fip.Resources\TRA051_B738_2018-05-30.json
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{FCAD30B4-EA57-4E31-902D-454348C1A4E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{06EA31C6-E68B-46CA-9529-F404EB828E45}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adsbiq", "adsbiq", "{BCC4F270-6D25-4332-A66E-F98F5A2F3386}"
-	ProjectSection(SolutionItems) = preProject
-		C:\Users\sorin\Downloads\caribbean_sample_2026-06-29.parquet = C:\Users\sorin\Downloads\caribbean_sample_2026-06-29.parquet
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
