@@ -1,9 +1,8 @@
 <div class="altitude-chart-shell">
   @if (chartPoints.length === 0) {
     <p class="chart-empty" role="status">Altitude data is unavailable for this flight.</p>
-  } @else {
-    <div class="chart-container">
-      <canvas #chartCanvas aria-label="Aircraft altitude profile" role="img"></canvas>
-    </div>
   }
+  <div class="chart-container" [class.chart-container--hidden]="chartPoints.length === 0">
+    <canvas #chartCanvas aria-label="Aircraft altitude profile" role="img"></canvas>
+  </div>
 </div>

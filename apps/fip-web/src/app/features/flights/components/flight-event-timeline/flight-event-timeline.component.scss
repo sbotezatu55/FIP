@@ -1,86 +1,92 @@
 .timeline-empty {
   padding: 1.35rem;
   margin: 0;
-  border: 1px solid #dbe4ee;
-  border-radius: 0.75rem;
-  background: #ffffff;
-  color: #526579;
+  border: 1px solid var(--fip-border);
+  border-radius: var(--fip-radius-md);
+  background: var(--fip-surface);
+  color: var(--fip-text-secondary);
 }
 
 .event-timeline {
   position: relative;
   display: grid;
   gap: 0;
-  padding: 0.5rem 0 0.5rem 1rem;
+  padding: 0.5rem 0.25rem 0.5rem 0.55rem;
   margin: 0;
   list-style: none;
-}
-
-.event-timeline::before {
-  position: absolute;
-  top: 1rem;
-  bottom: 1rem;
-  left: 1.45rem;
-  width: 2px;
-  background: #dbe4ee;
-  content: '';
 }
 
 .timeline-event {
   position: relative;
   display: grid;
-  grid-template-columns: 1rem 1fr;
-  gap: 1rem;
-  min-height: 5rem;
+  grid-template-columns: 1rem 5rem minmax(0, 1fr);
+  gap: 0.65rem;
+  min-height: 3.8rem;
+}
+
+.timeline-event:not(:last-child)::after {
+  position: absolute;
+  top: 1rem;
+  bottom: -0.2rem;
+  left: 0.45rem;
+  width: 1px;
+  background: var(--fip-cyan);
+  content: '';
 }
 
 .timeline-marker {
   z-index: 1;
   width: 0.9rem;
   height: 0.9rem;
-  margin-top: 0.3rem;
-  border: 3px solid #ffffff;
+  margin-top: 0.2rem;
+  border: 2px solid var(--fip-surface-alt);
   border-radius: 50%;
-  background: #1b6ca8;
-  box-shadow: 0 0 0 1px #b9c9d8;
+  background: var(--fip-cyan);
+  box-shadow: 0 0 0 1px var(--fip-border-soft);
 }
 
 .timeline-content {
-  padding: 0 0 1.5rem;
+  padding: 0 0 0.75rem;
 }
 
-.timeline-content time {
-  display: block;
-  margin-bottom: 0.35rem;
-  color: #526579;
+.timeline-event > time {
+  padding-top: 0.05rem;
+  color: var(--fip-cyan);
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .timeline-content h3 {
-  margin: 0 0 0.35rem;
-  color: #12304a;
-  font-size: 1.05rem;
+  margin: 0 0 0.15rem;
+  color: var(--fip-text);
+  font-size: 0.95rem;
 }
 
 .timeline-content p {
   margin: 0;
-  color: #526579;
+  font-size: 0.85rem;
+  color: var(--fip-text-secondary);
 }
 
 .timeline-event--takeoff .timeline-marker {
-  background: #1e8f63;
+  background: var(--fip-cyan);
 }
 
 .timeline-event--landing .timeline-marker {
-  background: #c65555;
+  background: var(--fip-cyan);
 }
 
 .timeline-event--topofclimb .timeline-marker,
 .timeline-event--topofdescent .timeline-marker {
-  background: #8a5a24;
+  background: var(--fip-cyan);
 }
 
 .timeline-event--telemetrygap .timeline-marker {
-  background: #6a3d8e;
+  background: var(--fip-cyan);
+}
+
+@media (max-width: 560px) {
+  .timeline-event { grid-template-columns: 1rem 4.5rem minmax(0, 1fr); gap: 0.5rem; }
+  .timeline-event > time { font-size: 0.75rem; }
 }

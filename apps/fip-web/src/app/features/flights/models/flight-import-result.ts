@@ -22,3 +22,24 @@ export interface FlightImportDiagnostics {
   warnings: string[];
   durationMilliseconds: number;
 }
+
+export type FlightImportCandidateStatus = 'Complete' | 'PartialStart' | 'PartialEnd' | 'TooShort';
+
+export interface FlightImportCandidate {
+  candidateId: string;
+  callsign: string | null;
+  icao24: string;
+  startTime: string;
+  endTime: string;
+  points: number;
+  status: FlightImportCandidateStatus;
+}
+
+export interface FlightImportPreviewResult {
+  previewId: string;
+  candidates: FlightImportCandidate[];
+  source: string;
+  filename: string;
+  recordsRead: number;
+  duplicateRecordsRemoved: number;
+}

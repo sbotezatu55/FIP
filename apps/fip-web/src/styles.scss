@@ -18,6 +18,7 @@
   --fip-cyan-soft: #1699b5;
   --fip-warning: #d6a842;
   --fip-danger: #ef6969;
+  --fip-delete: var(--fip-danger);
   --fip-radius-sm: 0.35rem;
   --fip-radius-md: 0.65rem;
   --fip-content-width: 1500px;
@@ -217,3 +218,22 @@ textarea {
   border-color: var(--fip-cyan-soft);
   color: var(--fip-cyan);
 }
+
+.delete-dialog {
+  width: min(100% - 2rem, 30rem);
+  max-width: 30rem;
+  padding: 1.5rem;
+  border: 1px solid var(--fip-border);
+  border-radius: var(--fip-radius-md);
+  background: var(--fip-surface);
+  color: var(--fip-text);
+}
+
+.delete-dialog::backdrop { background: rgb(4 10 15 / 72%); }
+.delete-dialog h2 { margin: 0 0 0.65rem; color: var(--fip-text); }
+.delete-dialog p:not(.fip-eyebrow):not(.delete-error) { color: var(--fip-text-secondary); }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+.delete-confirm-button { border-color: var(--fip-delete); background: var(--fip-delete); color: var(--fip-bg-deep); }
+.delete-confirm-button:hover:not(:disabled) { background: #d95757; }
+.delete-error { color: var(--fip-danger); }
+app-fip-icon.delete-icon { color: var(--fip-delete); }

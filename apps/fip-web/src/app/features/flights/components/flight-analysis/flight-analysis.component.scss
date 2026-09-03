@@ -1,5 +1,10 @@
 :host { display: block; }
 
-.analysis { padding: 1.35rem; }
-.analysis h2 { margin: 0 0 0.75rem; }
-.analysis p { margin: 0; color: var(--fip-text-secondary); }
+.analysis { padding: 0.7rem 0.65rem 0.65rem; }
+.analysis h2 { margin: 0 0 0.45rem 0.35rem; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.analysis-list { padding: 0 0.35rem; border: 1px solid var(--fip-border); border-radius: var(--fip-radius-md); background: var(--fip-surface-alt); }
+.analysis-row { display: grid; grid-template-columns: 2rem 1fr auto; gap: 0.7rem; align-items: center; min-height: 2.8rem; border-bottom: 1px solid var(--fip-border); }
+.analysis-row:last-child { border-bottom: 0; }
+.analysis-row app-fip-icon { color: var(--fip-cyan); }
+.analysis-row span { color: var(--fip-text-secondary); }
+.analysis-row strong { color: var(--fip-text); font-size: 1rem; }

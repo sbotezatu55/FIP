@@ -5,8 +5,8 @@
     @for (event of chronologicalEvents; track event.id) {
       <li class="timeline-event" [class]="'timeline-event timeline-event--' + eventClass(event.type)">
         <span class="timeline-marker" aria-hidden="true"></span>
+        <time [attr.datetime]="event.timestamp">{{ event.timestamp | date: 'h:mm a' }}</time>
         <div class="timeline-content">
-          <time [attr.datetime]="event.timestamp">{{ event.timestamp | date: 'medium' }}</time>
           <h3>{{ eventLabel(event.type) }}</h3>
           @if (event.description) {
             <p>{{ event.description }}</p>

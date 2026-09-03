@@ -152,6 +152,10 @@ tbody tr:hover {
   margin-left: 0.25rem;
 }
 
+.flight-actions { display: flex; align-items: center; gap: 1rem; }
+.delete-icon-button { display: inline-flex; padding: 0.35rem; border: 1px solid transparent; border-radius: var(--fip-radius-sm); background: transparent; color: var(--fip-delete); cursor: pointer; }
+.delete-icon-button:hover { border-color: var(--fip-delete); background: rgb(239 105 105 / 10%); }
+
 .visually-hidden {
   position: absolute;
   width: 1px;

@@ -6,6 +6,7 @@ using Fip.Application.FlightEvents;
 using Fip.Application.Flights;
 using Fip.Application.Imports;
 using Fip.Application.Imports.ImportFlightTrajectory;
+using Fip.Application.Imports.ImportFlightPreview;
 using Fip.Application.Telemetry;
 using Fip.SharedKernel.Geography;
 
@@ -18,7 +19,11 @@ public static class DependencyInjection
         services.AddSingleton<AircraftService>();
         services.AddSingleton<ImportFlightService>();
         services.AddScoped<IImportFlightTrajectoryService, ImportFlightTrajectoryService>();
+        services.AddScoped<IImportFlightPreviewService, ImportFlightPreviewService>();
+        services.AddSingleton<IImportFlightPreviewStore, ImportFlightPreviewStore>();
         services.AddScoped<IFlightQueryService, FlightQueryService>();
+        services.AddScoped<IFlightDeletionService, FlightDeletionService>();
+        services.AddScoped<IFlightAnalysisService, FlightAnalysisService>();
         services.AddSingleton<FlightService>();
         services.AddSingleton<IFlightReconstructor, FlightReconstructor>();
         services.AddSingleton<IFlightSummaryCalculator, FlightSummaryCalculator>();

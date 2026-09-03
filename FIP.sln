@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.9.12023.133 insiders
+VisualStudioVersion = 18.9.12023.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -67,6 +67,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{FCAD30B4-EA57-4E31-902D-454348C1A4E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{06EA31C6-E68B-46CA-9529-F404EB828E45}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adsbiq", "adsbiq", "{BCC4F270-6D25-4332-A66E-F98F5A2F3386}"
+	ProjectSection(SolutionItems) = preProject
+		C:\Users\sorin\Downloads\caribbean_sample_2026-06-29.parquet = C:\Users\sorin\Downloads\caribbean_sample_2026-06-29.parquet
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -298,6 +303,7 @@ Global
 		{42A29172-3B61-477C-B184-8DD8EF62D4F0} = {7F96C687-7425-4259-B4D6-DECB980E09F9}
 		{966260DD-EFB3-4EE8-BB0D-5361D2003315} = {06EA31C6-E68B-46CA-9529-F404EB828E45}
 		{06EA31C6-E68B-46CA-9529-F404EB828E45} = {FCAD30B4-EA57-4E31-902D-454348C1A4E5}
+		{BCC4F270-6D25-4332-A66E-F98F5A2F3386} = {06EA31C6-E68B-46CA-9529-F404EB828E45}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4129A8B5-5979-4E64-9BD5-EA01C6A1655C}

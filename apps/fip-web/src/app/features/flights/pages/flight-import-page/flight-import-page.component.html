@@ -4,16 +4,16 @@
   <header class="page-header">
     <p class="eyebrow">Flight ingestion</p>
     <h1 id="import-title">Import Flight Data</h1>
-    <p>Upload an OpenSky trajectory JSON file for reconstruction and analysis.</p>
+    <p>Upload an OpenSky JSON trajectory or ADSBiq Parquet file for reconstruction and review.</p>
   </header>
 
   <div class="import-card">
     <div class="file-field">
-      <label for="flight-file">OpenSky JSON trajectory</label>
+      <label for="flight-file">Flight data file</label>
       <input
         id="flight-file"
         type="file"
-        accept=".json,application/json"
+        accept=".json,.parquet,application/json,application/octet-stream"
         [disabled]="isImporting"
         (change)="onFileSelected($event)" />
     </div>
@@ -24,7 +24,7 @@
         <span>{{ formatFileSize(selectedFile.size) }}</span>
       </p>
     } @else {
-      <p class="file-hint">Choose a JSON trajectory file to begin.</p>
+      <p class="file-hint">Choose a JSON or Parquet file to begin.</p>
     }
 
     <button
@@ -47,6 +47,9 @@
         } @else {
           <p class="status-heading">Processing flight...</p>
           <p class="status-detail">The server is validating telemetry, reconstructing the flight, detecting events, and calculating the summary.</p>
+        }
+        @if (debugMessage) {
+          <p class="status-detail">Debug: {{ debugMessage }}</p>
         }
       </section>
     }
@@ -75,6 +78,38 @@
         }
         <a class="result-link" [routerLink]="['/flights', importResult.flightId]">View Flight</a>
       </div>
+    }
+
+    @if (importState === 'completed' && previewResult) {
+      <section class="result-panel preview-panel" aria-labelledby="preview-title">
+        <h2 id="preview-title">Reconstructed flights</h2>
+        <p>{{ previewResult.candidates.length }} candidates · {{ previewResult.duplicateRecordsRemoved | number: '1.0-0' }} duplicate records removed</p>
+        @if (candidateActionMessage) {
+          <p class="status-detail" role="status">{{ candidateActionMessage }}</p>
+        }
+        @if (previewResult.candidates.length > 100) {
+          <p class="status-detail">Showing the first 100 candidates.</p>
+        }
+        <div class="preview-table-wrap">
+          <table>
+            <thead><tr><th>Callsign</th><th>Aircraft</th><th>Start</th><th>End</th><th>Points</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              @for (candidate of displayedCandidates; track candidate.candidateId) {
+                <tr>
+                  <td>{{ candidate.callsign || 'Unknown' }}</td><td>{{ candidate.icao24 }}</td>
+                  <td>{{ candidate.startTime | date: 'HH:mm' }}</td><td>{{ candidate.endTime | date: 'HH:mm' }}</td>
+                  <td>{{ candidate.points | number: '1.0-0' }}</td><td>{{ candidate.status }}</td>
+                  <td class="candidate-actions">
+                    @if (candidate.status === 'Complete') { <button type="button" class="secondary-button candidate-import-button" (click)="importCandidate(candidate)" [disabled]="busyCandidateId !== null"><app-fip-icon name="ingest" [size]="16" /> Import</button> }
+                    @else if (candidate.status === 'TooShort') { <button type="button" class="secondary-button" (click)="ignoreCandidate(candidate)" [disabled]="busyCandidateId !== null">Ignore</button> }
+                    @else { <button type="button" class="secondary-button" (click)="reviewCandidate(candidate)" [disabled]="busyCandidateId !== null">Review</button> }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
     }
   </div>
 </section>

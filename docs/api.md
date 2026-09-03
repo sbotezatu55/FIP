@@ -2,7 +2,7 @@
 
 ## Current status
 
-The API host exposes the first read-only flight query endpoints. Controllers delegate to `Fip.Application`; the API does not access EF Core or `FipDbContext` directly.
+The API host exposes flight query, deletion, reprocessing, and import endpoints. Controllers delegate to `Fip.Application`; the API does not access EF Core or `FipDbContext` directly.
 
 `Fip.Api.Program` creates a WebApplication builder, registers Application, Infrastructure, Persistence, and Identity services, registers MVC controllers, maps controller routes, and runs the application.
 
@@ -41,6 +41,18 @@ GET /api/flights/{id}/events
 Returns `200 OK` with stored `FlightEventDto` records ordered by event timestamp ascending. Event types are serialized as stable names such as `Takeoff`, `Landing`, and `TelemetryGap`; existing event coordinates, altitude, and descriptions are included when available. A known flight with no events returns `[]`; an unknown flight returns `404 Not Found`. The endpoint reads stored events and does not run event detection.
 
 ```http
+POST /api/flights/{id}/reprocess
+```
+
+Recalculates derived flight analysis from the normalized telemetry already stored for the flight and replaces its persisted event records. The current supported data type is `OpenSky`; the application-facing supported-data-type contract is extensible for future normalized flight-data sources. Returns `200 OK` with the flight ID, data type, and number of detected events, or `404 Not Found` when the flight does not exist.
+
+```http
+DELETE /api/flights/{id}
+```
+
+Permanently deletes the selected flight and its persisted telemetry and events through the existing cascade relationships. Returns `204 No Content` when the flight is deleted or `404 Not Found` when the ID does not exist.
+
+```http
 POST /api/flights/import
 Content-Type: multipart/form-data
 ```
@@ -50,6 +62,13 @@ Accepts one OpenSky JSON trajectory file in the `File` form field and delegates 
 Successful responses include a `diagnostics` object with `source`, logical `filename`, UTC `importedAtUtc`, `recordsRead`, `recordsRejected`, aggregated `warnings`, and numeric `durationMilliseconds`. Diagnostics are returned by the application workflow but are not persisted as import history in the current persistence design.
 
 The response contains flight identity, time bounds, callsign, and summary location/altitude fields. Telemetry and events are not included.
+
+```http
+POST /api/flights/import/preview
+Content-Type: multipart/form-data
+```
+
+Accepts an ADSBiq `.parquet` file and returns reconstructed flight candidates without persisting them. Each candidate includes callsign, ICAO24, time bounds, point count, and a status (`Complete`, `PartialStart`, `PartialEnd`, or `TooShort`). Candidates can then be explicitly imported with `POST /api/flights/import/preview/{previewId}/{candidateId}` or discarded with `DELETE` on the same route.
 
 The file `src/Hosts/Fip.Api/Fip.Api.http` contains example requests for these endpoints. Range filtering, sampling, and downsampling are future extensions for large trajectories. Upload size limits and background import processing remain future concerns.
 

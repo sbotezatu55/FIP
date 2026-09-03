@@ -11,6 +11,8 @@
   height: 340px;
 }
 
+.chart-container--hidden { display: none; }
+
 .chart-empty {
   display: grid;
   min-height: 300px;

@@ -1,13 +1,14 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { FlightListItem } from '../../models/flight-list-item';
 import { FlightsApiService } from '../../services/flights-api.service';
+import { FipIconComponent } from '../../../../shared/components/fip-icon/fip-icon.component';
 
 @Component({
   selector: 'app-flight-list-page',
-  imports: [DatePipe, DecimalPipe, RouterLink],
+  imports: [DatePipe, DecimalPipe, RouterLink, FipIconComponent],
   templateUrl: './flight-list-page.component.html',
   styleUrl: './flight-list-page.component.scss'
 })
@@ -18,6 +19,11 @@ export class FlightListPageComponent {
   flights: FlightListItem[] = [];
   isLoading = true;
   errorMessage: string | null = null;
+  selectedFlight: FlightListItem | null = null;
+  isDeleting = false;
+  deleteErrorMessage: string | null = null;
+
+  @ViewChild('deleteDialog') private deleteDialog?: ElementRef<HTMLDialogElement>;
 
   constructor() {
     this.loadFlights();
@@ -44,6 +50,39 @@ export class FlightListPageComponent {
           this.changeDetector.markForCheck();
         }
       });
+  }
+
+  requestDelete(flight: FlightListItem): void {
+    this.selectedFlight = flight;
+    this.deleteErrorMessage = null;
+    this.deleteDialog?.nativeElement.showModal();
+  }
+
+  cancelDelete(): void {
+    this.deleteDialog?.nativeElement.close();
+    this.selectedFlight = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.selectedFlight || this.isDeleting) return;
+
+    const flightId = this.selectedFlight.id;
+    this.isDeleting = true;
+    this.deleteErrorMessage = null;
+    this.flightsApi.deleteFlight(flightId).pipe(finalize(() => {
+      this.isDeleting = false;
+      this.changeDetector.markForCheck();
+    })).subscribe({
+      next: () => {
+        this.flights = this.flights.filter(flight => flight.id !== flightId);
+        this.cancelDelete();
+        this.changeDetector.markForCheck();
+      },
+      error: () => {
+        this.deleteErrorMessage = 'Unable to delete this flight.';
+        this.changeDetector.markForCheck();
+      }
+    });
   }
 
   formatDuration(duration: string): string {

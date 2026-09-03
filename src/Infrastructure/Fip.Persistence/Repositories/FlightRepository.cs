@@ -1,11 +1,12 @@
 using Fip.Application.Abstractions.Persistence;
 using Fip.Domain.Flights;
 using Fip.Persistence.Context;
+using Fip.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fip.Persistence.Repositories;
 
-public sealed class FlightRepository(FipDbContext dbContext) : IFlightRepository
+public sealed class FlightRepository(FipDbContext dbContext) : IFlightRepository, IFlightAnalysisRepository
 {
     public async Task<IReadOnlyList<FlightQueryModel>> GetAllAsync(
         CancellationToken cancellationToken = default)
@@ -151,5 +152,52 @@ public sealed class FlightRepository(FipDbContext dbContext) : IFlightRepository
         ArgumentNullException.ThrowIfNull(flight);
 
         await dbContext.Flights.AddAsync(FlightMapper.ToEntity(flight), cancellationToken);
+    }
+
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var flight = await dbContext.Flights
+            .FirstOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
+
+        if (flight is null)
+        {
+            return false;
+        }
+
+        dbContext.Flights.Remove(flight);
+        return true;
+    }
+
+    public async Task<bool> ReplaceEventsAsync(
+        Guid flightId,
+        IReadOnlyCollection<Fip.Domain.FlightEvents.FlightEvent> events,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(events);
+
+        var flight = await dbContext.Flights
+            .Include(candidate => candidate.Events)
+            .FirstOrDefaultAsync(candidate => candidate.Id == flightId, cancellationToken);
+
+        if (flight is null)
+        {
+            return false;
+        }
+
+        dbContext.FlightEvents.RemoveRange(flight.Events);
+
+        var eventEntities = events.Select(flightEvent => new FlightEventEntity
+        {
+            FlightId = flightId,
+            Type = flightEvent.Type,
+            Timestamp = flightEvent.Timestamp,
+            Latitude = flightEvent.TelemetryPoint?.Latitude,
+            Longitude = flightEvent.TelemetryPoint?.Longitude,
+            AltitudeFeet = flightEvent.TelemetryPoint?.AltitudeFeet,
+            Description = flightEvent.Description
+        });
+
+        await dbContext.FlightEvents.AddRangeAsync(eventEntities, cancellationToken);
+        return true;
     }
 }

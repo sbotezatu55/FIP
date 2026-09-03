@@ -1,4 +1,8 @@
 <section class="analysis fip-panel" aria-labelledby="flight-analysis-title">
   <h2 id="flight-analysis-title">Flight Analysis</h2>
-  <p>Analysis and telemetry-quality observations will be available when analysis rules are configured.</p>
+  <div class="analysis-list">
+    <div class="analysis-row"><app-fip-icon name="telemetry" [size]="24" /><span>Telemetry quality</span><strong>—</strong></div>
+    <div class="analysis-row"><app-fip-icon name="trajectory" [size]="24" /><span>Points recorded</span><strong>{{ telemetry.length | number: '1.0-0' }}</strong></div>
+    <div class="analysis-row"><app-fip-icon name="flight-event" [size]="24" /><span>Events detected</span><strong>{{ events.length }}</strong></div>
+  </div>
 </section>

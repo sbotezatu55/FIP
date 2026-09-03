@@ -131,6 +131,8 @@ The import page reports real HTTP upload progress when the browser provides tota
 
 The Flight Detail trajectory map uses OpenStreetMap tiles with a tile-only dark-mode filter, preserving the FIP route and marker colors without requiring a map-provider API key. The map includes a fullscreen control that expands the route view using the browser Fullscreen API.
 
+The Flight Detail page includes a Reprocess Flight Data action. It calls `POST /api/flights/{id}/reprocess`, which recalculates derived events from persisted normalized telemetry without requiring the original source file to be imported again. The page displays an indeterminate horizontal progress line during recalculation and reports success or failure inline.
+
 ## Sample data
 
 The OpenSky integration fixture is `data/samples/opensky/TRA051_B738_2018-05-30.json`. The importer accepts a caller-supplied file path and does not depend on a fixed sample location.

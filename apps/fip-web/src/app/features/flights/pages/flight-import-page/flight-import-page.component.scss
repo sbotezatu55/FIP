@@ -210,3 +210,41 @@ progress {
   font-weight: 750;
   text-decoration: none;
 }
+
+.preview-panel {
+  overflow: hidden;
+}
+
+.preview-table-wrap {
+  overflow-x: auto;
+}
+
+.preview-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--fip-text);
+  font-size: 0.9rem;
+}
+
+.preview-panel th,
+.preview-panel td {
+  padding: 0.8rem 0.65rem;
+  border-bottom: 1px solid var(--fip-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.preview-panel th {
+  color: var(--fip-text-secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.candidate-actions .secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0;
+  padding: 0.45rem 0.7rem;
+}

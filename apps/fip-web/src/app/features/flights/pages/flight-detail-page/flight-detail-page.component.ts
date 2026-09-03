@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { FlightDetail } from '../../models/flight-detail';
 import { FlightSummary } from '../../models/flight-summary';
 import { FlightTelemetryPoint } from '../../models/flight-telemetry-point';
@@ -16,15 +16,17 @@ import { TrajectoryMapComponent } from '../../components/trajectory-map/trajecto
 import { AltitudeChartComponent } from '../../components/altitude-chart/altitude-chart.component';
 import { GroundspeedChartComponent } from '../../components/groundspeed-chart/groundspeed-chart.component';
 import { VerticalRateChartComponent } from '../../components/vertical-rate-chart/vertical-rate-chart.component';
+import { FipIconComponent } from '../../../../shared/components/fip-icon/fip-icon.component';
 
 @Component({
   selector: 'app-flight-detail-page',
-  imports: [RouterLink, FlightInformationComponent, FlightSummaryComponent, FlightAnalysisComponent, FlightProfileSectionComponent, FlightEventTimelineComponent, TrajectoryMapComponent, AltitudeChartComponent, GroundspeedChartComponent, VerticalRateChartComponent],
+  imports: [RouterLink, FipIconComponent, FlightInformationComponent, FlightSummaryComponent, FlightAnalysisComponent, FlightProfileSectionComponent, FlightEventTimelineComponent, TrajectoryMapComponent, AltitudeChartComponent, GroundspeedChartComponent, VerticalRateChartComponent],
   templateUrl: './flight-detail-page.component.html',
   styleUrl: './flight-detail-page.component.scss'
 })
 export class FlightDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly flightsApi = inject(FlightsApiService);
   private readonly changeDetector = inject(ChangeDetectorRef);
 
@@ -41,6 +43,13 @@ export class FlightDetailPageComponent {
   events: FlightEvent[] = [];
   eventsLoading = true;
   eventsErrorMessage: string | null = null;
+  isReprocessing = false;
+  reprocessErrorMessage: string | null = null;
+  reprocessSuccessMessage: string | null = null;
+  isDeleting = false;
+  deleteErrorMessage: string | null = null;
+
+  @ViewChild('deleteDialog') private deleteDialog?: ElementRef<HTMLDialogElement>;
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -108,6 +117,70 @@ export class FlightDetailPageComponent {
         this.changeDetector.markForCheck();
       }
     });
+  }
+
+  reprocessFlight(): void {
+    if (!this.flightId || this.isReprocessing) return;
+
+    this.isReprocessing = true;
+    this.reprocessErrorMessage = null;
+    this.reprocessSuccessMessage = null;
+    this.changeDetector.markForCheck();
+
+    this.flightsApi.reprocessFlight(this.flightId).subscribe({
+      next: (result) => {
+        forkJoin({
+          summary: this.flightsApi.getFlightSummary(this.flightId!),
+          events: this.flightsApi.getFlightEvents(this.flightId!)
+        }).subscribe({
+          next: ({ summary, events }) => {
+            this.summary = summary;
+            this.events = events;
+            this.eventsLoading = false;
+            this.isReprocessing = false;
+            this.reprocessSuccessMessage = `Flight recalculated. ${result.eventsDetected} events detected.`;
+            this.changeDetector.markForCheck();
+          },
+          error: () => this.finishReprocessingWithError('Flight was recalculated, but the updated results could not be loaded.')
+        });
+      },
+      error: (error: HttpErrorResponse) => {
+        const message = error.error?.message || 'Unable to recalculate this flight.';
+        this.finishReprocessingWithError(message);
+      }
+    });
+  }
+
+  requestDelete(): void {
+    this.deleteErrorMessage = null;
+    this.deleteDialog?.nativeElement.showModal();
+  }
+
+  cancelDelete(): void {
+    this.deleteDialog?.nativeElement.close();
+  }
+
+  confirmDelete(): void {
+    if (!this.flightId || this.isDeleting) return;
+
+    this.isDeleting = true;
+    this.deleteErrorMessage = null;
+    this.flightsApi.deleteFlight(this.flightId).pipe(finalize(() => {
+      this.isDeleting = false;
+      this.changeDetector.markForCheck();
+    })).subscribe({
+      next: () => this.router.navigateByUrl('/flights'),
+      error: () => {
+        this.deleteErrorMessage = 'Unable to delete this flight.';
+        this.changeDetector.markForCheck();
+      }
+    });
+  }
+
+  private finishReprocessingWithError(message: string): void {
+    this.isReprocessing = false;
+    this.reprocessErrorMessage = message;
+    this.changeDetector.markForCheck();
   }
 
   private isGuid(value: string): boolean {

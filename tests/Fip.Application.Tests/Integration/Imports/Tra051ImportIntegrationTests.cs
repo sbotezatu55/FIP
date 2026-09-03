@@ -103,6 +103,8 @@ public sealed class Tra051ImportIntegrationTests
             AddedFlight = flight;
             return Task.CompletedTask;
         }
+
+        public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult(false);
     }
 
     private sealed class NoOpUnitOfWork : IUnitOfWork

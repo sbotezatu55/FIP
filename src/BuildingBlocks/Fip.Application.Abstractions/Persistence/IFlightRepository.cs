@@ -57,4 +57,12 @@ public interface IFlightRepository
     Task AddAsync(
         Flight flight,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes a flight and its dependent telemetry and events when it exists.
+    /// </summary>
+    Task<bool> DeleteAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+
 }

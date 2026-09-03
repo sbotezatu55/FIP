@@ -1,9 +1,8 @@
 <div class="groundspeed-chart-shell">
   @if (chartPoints.length === 0) {
     <p class="chart-empty" role="status">Groundspeed data is unavailable for this flight.</p>
-  } @else {
-    <div class="chart-container">
-      <canvas #chartCanvas aria-label="Aircraft groundspeed profile" role="img"></canvas>
-    </div>
   }
+  <div class="chart-container" [class.chart-container--hidden]="chartPoints.length === 0">
+    <canvas #chartCanvas aria-label="Aircraft groundspeed profile" role="img"></canvas>
+  </div>
 </div>

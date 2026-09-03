@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-export type FipIconName = 'ingest' | 'normalize' | 'reconstruct' | 'detect' | 'analyze' | 'visualize' | 'aircraft' | 'airport' | 'runway' | 'trajectory' | 'flight-event' | 'telemetry' | 'clock' | 'distance' | 'altitude' | 'speed';
+export type FipIconName = 'ingest' | 'normalize' | 'reconstruct' | 'detect' | 'analyze' | 'visualize' | 'aircraft' | 'airport' | 'runway' | 'trajectory' | 'flight-event' | 'telemetry' | 'clock' | 'distance' | 'altitude' | 'speed' | 'delete';
 
 @Component({
   selector: 'app-fip-icon',

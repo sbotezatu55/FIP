@@ -314,6 +314,8 @@ public sealed class ImportFlightTrajectoryServiceTests
             CancellationToken = cancellationToken;
             return Task.CompletedTask;
         }
+
+        public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult(false);
     }
 
     private sealed class FakeUnitOfWork : IUnitOfWork

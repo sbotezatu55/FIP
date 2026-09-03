@@ -38,7 +38,7 @@
       </app-flight-profile-section>
 
       <aside class="sidebar">
-        <app-flight-analysis />
+        <app-flight-analysis [telemetry]="telemetry" [events]="events" />
         <section class="events-section fip-panel" aria-labelledby="flight-events-title">
           <h2 id="flight-events-title">Flight Events</h2>
           @if (eventsLoading) {
@@ -63,6 +63,50 @@
       <app-flight-profile-section title="Vertical Rate Profile" subtitle="Aircraft climb and descent rate throughout the reconstructed flight" [loading]="telemetryLoading" [errorMessage]="telemetryErrorMessage">
         <app-vertical-rate-chart [telemetry]="telemetry" />
       </app-flight-profile-section>
+
+      <section class="reprocess-section fip-panel" aria-labelledby="reprocess-title">
+        <div class="reprocess-content">
+          <div>
+            <h2 id="reprocess-title">Recalculate Flight Analysis</h2>
+            <p>Reprocess the stored telemetry and refresh detected events and derived flight results.</p>
+          </div>
+          <button class="reprocess-button" type="button" [disabled]="isReprocessing" (click)="reprocessFlight()">
+            {{ isReprocessing ? 'Recalculating...' : 'Reprocess Flight Data' }}
+          </button>
+        </div>
+        @if (isReprocessing) {
+          <div class="reprocess-progress" role="progressbar" aria-label="Recalculating flight data" aria-valuetext="Recalculation in progress"></div>
+        }
+        @if (reprocessErrorMessage) {
+          <p class="reprocess-message reprocess-message--error" role="alert">{{ reprocessErrorMessage }}</p>
+        }
+        @if (reprocessSuccessMessage) {
+          <p class="reprocess-message reprocess-message--success" role="status">{{ reprocessSuccessMessage }}</p>
+        }
+      </section>
+
+      <section class="delete-section" aria-labelledby="delete-title">
+        <div>
+          <h2 id="delete-title">Remove this flight</h2>
+          <p>Delete this flight and all of its stored telemetry and analysis.</p>
+        </div>
+        <button class="fip-button delete-flight-button" type="button" (click)="requestDelete()">
+          <app-fip-icon class="delete-icon" name="delete" [size]="18" /> Delete Flight
+        </button>
+      </section>
+
+      <dialog #deleteDialog class="delete-dialog" (cancel)="deleteErrorMessage = null">
+        <form method="dialog" (submit)="$event.preventDefault(); confirmDelete()">
+          <p class="fip-eyebrow">Confirm action</p>
+          <h2>Delete flight?</h2>
+          <p>This will permanently delete {{ flight.callsign || flight.icao24 }} and its reconstructed data.</p>
+          @if (deleteErrorMessage) { <p class="delete-error" role="alert">{{ deleteErrorMessage }}</p> }
+          <div class="dialog-actions">
+            <button class="fip-button fip-button--secondary" type="button" (click)="cancelDelete()">Cancel</button>
+            <button class="fip-button delete-confirm-button" type="submit" [disabled]="isDeleting">{{ isDeleting ? 'Deleting...' : 'Confirm Delete' }}</button>
+          </div>
+        </form>
+      </dialog>
 
   }
 </section>

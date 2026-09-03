@@ -4,7 +4,13 @@
 
 The implemented import path supports an OpenSky trajectory represented as a JSON array of telemetry objects. The real-flight integration fixture is expected at `data/samples/opensky/TRA051_B738_2018-05-30.json`; the persistence `Data` directory contains only `.gitkeep`.
 
-The importer accepts any compatible file path; it does not hard-code a sample path. The API upload endpoint accepts one `.json` file in multipart form, passes its stream to the application-neutral import overload, and does not write the upload to an arbitrary filesystem path.
+The importer accepts any compatible file path; it does not hard-code a sample path. The API upload endpoint accepts one `.json` file in multipart form, passes its stream to the application-neutral import overload, and does not write the upload to an arbitrary filesystem path. ADSBiq Parquet files use the preview workflow: the upload is reconstructed into candidate flights and remains unpersisted until an explicit per-candidate import action.
+
+## ADSBiq preview workflow
+
+`AdsbIqParquetTelemetryImporter` reads the source Parquet columns with `Parquet.Net` and forward-fills sparse ADSBiq diffs per aircraft, where a null field means the previous value is unchanged. The preview service removes duplicate `(hex, ts)` observations, excludes removed records, groups observations by ICAO24, maps ADSBiq units directly into normalized telemetry, and returns candidate flights. The preview does not persist the uploaded file.
+
+Candidate statuses are conservative: `TooShort` is used for trajectories with fewer than 10 points or less than two minutes of span. A candidate is `PartialStart` only when the source contains observations before it and its start is within two minutes of the source window; similarly, `PartialEnd` requires observations after the candidate. This avoids falsely marking a single-flight download as partial simply because its first and last observations are also the file bounds. Remaining candidates are `Complete`. Complete candidates expose an Import action, partial candidates expose Review, and too-short candidates expose Ignore.
 
 ## Pipeline
 

@@ -25,7 +25,9 @@ public static class DependencyInjection
                 connectionString,
                 sql => sql.MigrationsAssembly(typeof(FipDbContext).Assembly.FullName)));
 
-        services.AddScoped<IFlightRepository, FlightRepository>();
+        services.AddScoped<FlightRepository>();
+        services.AddScoped<IFlightRepository>(services => services.GetRequiredService<FlightRepository>());
+        services.AddScoped<IFlightAnalysisRepository>(services => services.GetRequiredService<FlightRepository>());
         services.AddScoped<IUnitOfWork, Fip.Persistence.UnitOfWork.UnitOfWork>();
 
         return services;

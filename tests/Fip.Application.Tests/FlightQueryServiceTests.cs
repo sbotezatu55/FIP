@@ -323,5 +323,7 @@ public sealed class FlightQueryServiceTests
 
         public Task AddAsync(Flight flight, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+        public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
     }
 }

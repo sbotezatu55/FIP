@@ -1,5 +1,7 @@
 using Fip.Application.Flights;
+using Fip.Application.Abstractions.Flights;
 using Fip.Application.Imports.ImportFlightTrajectory;
+using Fip.Application.Imports.ImportFlightPreview;
 using Fip.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -10,8 +12,47 @@ namespace Fip.Api.Controllers;
 [Route("api/flights")]
 public sealed class FlightsController(
     IFlightQueryService flightQueryService,
-    IImportFlightTrajectoryService? importFlightTrajectoryService = null) : ControllerBase
+    IImportFlightTrajectoryService? importFlightTrajectoryService = null,
+    IFlightAnalysisService? flightAnalysisService = null,
+    IImportFlightPreviewService? importFlightPreviewService = null,
+    IFlightDeletionService? flightDeletionService = null) : ControllerBase
 {
+    [HttpPost("import/preview")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<ImportFlightPreviewResponse>> PreviewImport(
+        [FromForm] ImportFlightRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (request.File is null || request.File.Length == 0) return BadRequest(new { message = "A non-empty Parquet file is required." });
+        if (importFlightPreviewService is null) throw new InvalidOperationException("The flight preview service is not configured.");
+        var fileName = Path.GetFileName(request.File.FileName);
+        if (!Path.GetExtension(fileName).Equals(".parquet", StringComparison.OrdinalIgnoreCase)) return BadRequest(new { message = "Only ADSBiq Parquet files are supported." });
+        try
+        {
+            await using var stream = request.File.OpenReadStream();
+            var result = await importFlightPreviewService.PreviewAsync(fileName, stream, cancellationToken);
+            return Ok(ImportFlightPreviewResponse.FromResult(result));
+        }
+        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+    }
+
+    [HttpPost("import/preview/{previewId:guid}/{candidateId:guid}")]
+    public async Task<ActionResult<ImportFlightTrajectoryResponse>> ImportPreviewCandidate(Guid previewId, Guid candidateId, CancellationToken cancellationToken)
+    {
+        if (importFlightPreviewService is null) throw new InvalidOperationException("The flight preview service is not configured.");
+        var result = await importFlightPreviewService.ImportCandidateAsync(previewId, candidateId, cancellationToken);
+        return result is null ? NotFound() : Ok(ImportFlightTrajectoryResponse.FromResult(result));
+    }
+
+    [HttpDelete("import/preview/{previewId:guid}/{candidateId:guid}")]
+    public ActionResult IgnorePreviewCandidate(Guid previewId, Guid candidateId)
+    {
+        if (importFlightPreviewService is null) throw new InvalidOperationException("The flight preview service is not configured.");
+        return importFlightPreviewService.IgnoreCandidate(previewId, candidateId) ? NoContent() : NotFound();
+    }
     [HttpPost("import")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<ImportFlightTrajectoryResponse>> ImportFlight(
@@ -100,6 +141,19 @@ public sealed class FlightsController(
         return flight is null ? NotFound() : Ok(flight);
     }
 
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteFlight(Guid id, CancellationToken cancellationToken)
+    {
+        if (flightDeletionService is null)
+        {
+            throw new InvalidOperationException("The flight deletion service is not configured.");
+        }
+
+        return await flightDeletionService.DeleteAsync(id, cancellationToken)
+            ? NoContent()
+            : NotFound();
+    }
+
     [HttpGet("{id:guid}/summary")]
     public async Task<ActionResult<FlightSummaryDto>> GetFlightSummary(
         Guid id,
@@ -128,5 +182,34 @@ public sealed class FlightsController(
         var events = await flightQueryService.GetFlightEventsAsync(id, cancellationToken);
 
         return events is null ? NotFound() : Ok(events);
+    }
+
+    [HttpPost("{id:guid}/reprocess")]
+    public async Task<ActionResult<FlightAnalysisResult>> ReprocessFlight(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        if (flightAnalysisService is null)
+        {
+            throw new InvalidOperationException("The flight analysis service is not configured.");
+        }
+
+        try
+        {
+            var result = await flightAnalysisService.RecalculateAsync(
+                id,
+                SupportedFlightDataType.OpenSky,
+                cancellationToken);
+
+            return result is null ? NotFound() : Ok(result);
+        }
+        catch (ArgumentOutOfRangeException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
     }
 }

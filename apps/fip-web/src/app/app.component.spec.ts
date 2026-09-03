@@ -17,7 +17,7 @@ describe('AppComponent', () => {
 
     const links = Array.from(fixture.nativeElement.querySelectorAll('.app-nav a')) as HTMLAnchorElement[];
 
-    expect(links.map((link) => link.textContent?.trim())).toEqual(['Flights', 'About', 'Features', 'Technology']);
+    expect(links.map((link) => link.textContent?.trim())).toEqual(['Home', 'Import File', 'Flights', 'Features', 'Technology']);
   });
 
   it('configures the requested routes', () => {

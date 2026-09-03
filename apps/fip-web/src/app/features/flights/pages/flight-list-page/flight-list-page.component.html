@@ -49,11 +49,29 @@
                   —
                 }
               </td>
-              <td><a class="view-link" [routerLink]="['/flights', flight.id]">Explore <span aria-hidden="true">→</span></a></td>
+              <td class="flight-actions">
+                <a class="view-link" [routerLink]="['/flights', flight.id]">Explore <span aria-hidden="true">→</span></a>
+                <button class="delete-icon-button" type="button" [attr.aria-label]="'Delete ' + (flight.callsign || flight.icao24)" title="Delete flight" (click)="requestDelete(flight)">
+                  <app-fip-icon class="delete-icon" name="delete" [size]="18" />
+                </button>
+              </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
   }
+
+  <dialog #deleteDialog class="delete-dialog" (cancel)="selectedFlight = null">
+    <form method="dialog" (submit)="$event.preventDefault(); confirmDelete()">
+      <p class="fip-eyebrow">Confirm action</p>
+      <h2>Delete flight?</h2>
+      <p>This will permanently delete {{ selectedFlight?.callsign || selectedFlight?.icao24 || 'this flight' }} and its reconstructed data.</p>
+      @if (deleteErrorMessage) { <p class="delete-error" role="alert">{{ deleteErrorMessage }}</p> }
+      <div class="dialog-actions">
+        <button class="fip-button fip-button--secondary" type="button" (click)="cancelDelete()">Cancel</button>
+        <button class="fip-button delete-confirm-button" type="submit" [disabled]="isDeleting">{{ isDeleting ? 'Deleting...' : 'Confirm Delete' }}</button>
+      </div>
+    </form>
+  </dialog>
 </section>
