@@ -244,8 +244,15 @@ jobs:
           function Remove-ManagedFilesNotInSet {
             param(
               [Parameter(Mandatory = $true)][string]$Root,
-              [Parameter(Mandatory = $true)][string[]]$CurrentFiles,
-              [Parameter(Mandatory = $true)][string[]]$AllowedFiles,
+
+            [AllowEmptyCollection()]
+            [AllowNull()]
+            [string[]]$CurrentFiles = @(),
+
+            [AllowEmptyCollection()]
+            [AllowNull()]
+            [string[]]$AllowedFiles = @(),
+
               [string[]]$ProtectedPatterns = @()
             )
 
