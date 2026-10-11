@@ -3,6 +3,7 @@ using Fip.Identity;
 using Fip.Infrastructure;
 using Fip.Persistence;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
