@@ -10,6 +10,7 @@ namespace Fip.Api.Controllers;
 
 [ApiController]
 [Route("api/flights")]
+[Route("flights")]
 public sealed class FlightsController(
     IFlightQueryService flightQueryService,
     IImportFlightTrajectoryService? importFlightTrajectoryService = null,

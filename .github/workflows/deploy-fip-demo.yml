@@ -1,0 +1,448 @@
+name: Deploy FIP demo
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: fip-demo-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Windows, X64, fip-demo]
+    timeout-minutes: 30
+    env:
+      API_PROJECT: src\Hosts\Fip.Api\Fip.Api.csproj
+      FRONTEND_DIST: apps\fip-web\dist\fip-web\browser
+      SITE_ROOT: C:\inetpub\wwwroot\ATS.FIP
+      FRONTEND_DEST: C:\inetpub\wwwroot\ATS.FIP\WEB
+      API_DEST: C:\inetpub\wwwroot\ATS.FIP\API
+      BACKUP_ROOT: C:\inetpub\backups\ATS.FIP
+
+    steps:
+      - name: Require fip-demo workflow ref
+        shell: powershell
+        run: |
+          if ($env:GITHUB_REF -ne 'refs/heads/fip-demo') {
+            throw "This workflow must be started from the fip-demo branch. Actual ref: $env:GITHUB_REF"
+          }
+
+      - name: Checkout fip-demo
+        uses: actions/checkout@v4
+        with:
+          ref: fip-demo
+          fetch-depth: 0
+          clean: true
+
+      - name: Verify checked out revision
+        shell: powershell
+        run: |
+          $expectedCommit = (git rev-parse refs/remotes/origin/fip-demo).Trim()
+          $actualCommit = (git rev-parse HEAD).Trim()
+
+          if ($actualCommit -ne $expectedCommit) {
+            throw "The deployment checkout is not the current origin/fip-demo revision."
+          }
+
+          Write-Host "Deploying fip-demo commit $actualCommit"
+
+      - name: Runner diagnostics
+        shell: powershell
+        run: |
+          whoami
+          Write-Host "Runner=$env:RUNNER_NAME"
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+          cache-dependency-path: apps/fip-web/package-lock.json
+
+      - name: Toolchain diagnostics
+        shell: powershell
+        run: |
+          dotnet --info
+          node --version
+          npm --version
+
+      - name: Restore API
+        shell: powershell
+        run: dotnet restore "$env:API_PROJECT"
+
+      - name: Install frontend dependencies
+        working-directory: apps/fip-web
+        shell: powershell
+        run: npm ci
+
+      - name: Build API
+        shell: powershell
+        run: dotnet build "$env:API_PROJECT" -c Release --no-restore
+
+      - name: Build frontend
+        working-directory: apps/fip-web
+        shell: powershell
+        run: npm run build -- --configuration production
+
+      - name: Prepare deployment staging
+        shell: powershell
+        run: |
+          $deploymentRoot = Join-Path $env:RUNNER_TEMP "fip-deploy-$env:GITHUB_RUN_ID"
+
+          if (Test-Path -LiteralPath $deploymentRoot) {
+            Remove-Item -LiteralPath $deploymentRoot -Recurse -Force
+          }
+
+          New-Item -ItemType Directory -Path $deploymentRoot -Force | Out-Null
+          "DEPLOY_ROOT=$deploymentRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Publish API to staging
+        shell: powershell
+        run: |
+          $apiStage = Join-Path $env:DEPLOY_ROOT 'API'
+          dotnet publish "$env:API_PROJECT" -c Release --no-build --no-restore -o $apiStage
+
+      - name: Copy frontend build to staging
+        shell: powershell
+        run: |
+          $frontendStage = Join-Path $env:DEPLOY_ROOT 'WEB'
+          New-Item -ItemType Directory -Path $frontendStage -Force | Out-Null
+          Copy-Item -Path (Join-Path $env:FRONTEND_DIST '*') -Destination $frontendStage -Recurse -Force
+
+      - name: Validate deployment staging
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $apiStage = Join-Path $env:DEPLOY_ROOT 'API'
+          $frontendStage = Join-Path $env:DEPLOY_ROOT 'WEB'
+
+          $requiredFiles = @(
+            (Join-Path $apiStage 'web.config'),
+            (Join-Path $apiStage 'appsettings.json'),
+            (Join-Path $frontendStage 'index.html'),
+            (Join-Path $frontendStage 'web.config')
+          )
+
+          foreach ($file in $requiredFiles) {
+            if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+              throw "Required staged deployment file is missing: $file"
+            }
+          }
+
+          if (Get-ChildItem -LiteralPath $env:DEPLOY_ROOT -Recurse -Directory |
+              Where-Object { $_.Name -in @('bin', 'obj') }) {
+            throw 'The staging output contains bin or obj directories.'
+          }
+
+          Write-Host 'API and frontend staging validation succeeded.'
+
+      - name: Back up current IIS directories
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+          $backupPath = Join-Path $env:BACKUP_ROOT "$timestamp-$env:GITHUB_RUN_ID"
+          $webBackup = Join-Path $backupPath 'WEB'
+          $apiBackup = Join-Path $backupPath 'API'
+
+          try {
+            foreach ($destination in @($env:FRONTEND_DEST, $env:API_DEST)) {
+              if (-not (Test-Path -LiteralPath $destination -PathType Container)) {
+                throw "Required IIS deployment directory does not exist: $destination"
+              }
+            }
+
+            New-Item -ItemType Directory -Path $webBackup, $apiBackup -Force | Out-Null
+
+            robocopy $env:FRONTEND_DEST $webBackup /E /COPY:DAT /DCOPY:DAT /R:2 /W:2 /NFL /NDL /NJH /NJS /NP
+            $webCode = $LASTEXITCODE
+            if ($webCode -gt 7) {
+              throw "WEB backup failed with ROBOCOPY code $webCode."
+            }
+
+            robocopy $env:API_DEST $apiBackup /E /COPY:DAT /DCOPY:DAT /R:2 /W:2 /NFL /NDL /NJH /NJS /NP
+            $apiCode = $LASTEXITCODE
+            if ($apiCode -gt 7) {
+              throw "API backup failed with ROBOCOPY code $apiCode."
+            }
+
+            if (-not (Test-Path -LiteralPath $webBackup -PathType Container) -or
+                -not (Test-Path -LiteralPath $apiBackup -PathType Container)) {
+              throw 'Backup verification failed because one or more backup directories are missing.'
+            }
+
+            "DEPLOY_BACKUP=$backupPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            Write-Host "Created deployment backup: $backupPath"
+          } catch {
+            throw "Backup failed before IIS was modified. $($_.Exception.Message)"
+          }
+
+      - name: Deploy, verify, and roll back on failure
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          function Get-RelativeFiles {
+            param(
+              [Parameter(Mandatory = $true)][string]$Root,
+              [string[]]$ExcludedFilePatterns = @()
+            )
+
+            if (-not (Test-Path -LiteralPath $Root -PathType Container)) {
+              return @()
+            }
+
+            $rootFull = [IO.Path]::GetFullPath($Root).TrimEnd('\')
+            $files = @(
+              Get-ChildItem -LiteralPath $rootFull -File -Recurse |
+                Where-Object {
+                  $excluded = $false
+                  foreach ($pattern in $ExcludedFilePatterns) {
+                    if ($_.Name -like $pattern) {
+                      $excluded = $true
+                      break
+                    }
+                  }
+
+                  -not $excluded
+                } |
+                ForEach-Object {
+                  $_.FullName.Substring($rootFull.Length).TrimStart('\')
+                }
+            )
+
+            return $files
+          }
+
+          function Get-SafePath {
+            param(
+              [Parameter(Mandatory = $true)][string]$Root,
+              [Parameter(Mandatory = $true)][string]$RelativePath
+            )
+
+            $rootFull = [IO.Path]::GetFullPath($Root).TrimEnd('\') + '\'
+            $targetFull = [IO.Path]::GetFullPath((Join-Path $Root $RelativePath))
+
+            if (-not $targetFull.StartsWith($rootFull, [StringComparison]::OrdinalIgnoreCase)) {
+              throw "Refusing to access a path outside deployment root: $RelativePath"
+            }
+
+            return $targetFull
+          }
+
+          function Remove-ManagedFilesNotInSet {
+            param(
+              [Parameter(Mandatory = $true)][string]$Root,
+              [Parameter(Mandatory = $true)][string[]]$CurrentFiles,
+              [Parameter(Mandatory = $true)][string[]]$AllowedFiles,
+              [string[]]$ProtectedPatterns = @()
+            )
+
+            foreach ($relativePath in $CurrentFiles) {
+              if ([string]::IsNullOrWhiteSpace($relativePath) -or
+                  $AllowedFiles -contains $relativePath) {
+                continue
+              }
+
+              $normalizedPath = $relativePath.Replace('/', '\').TrimStart('\')
+              $pathSegments = $normalizedPath -split '\\'
+              $fileName = [IO.Path]::GetFileName($normalizedPath)
+              $isPersistentPath =
+                @('upload', 'uploads', 'log', 'logs', 'App_Data') |
+                  Where-Object { $pathSegments -contains $_ } |
+                  Select-Object -First 1
+
+              $isDatabaseFile = $normalizedPath -match '\.(db|sqlite|sqlite3|mdf|ndf|ldf|bak)$'
+              $isProtectedConfiguration = $false
+              foreach ($pattern in $ProtectedPatterns) {
+                if ($fileName -like $pattern) {
+                  $isProtectedConfiguration = $true
+                  break
+                }
+              }
+
+              if ($isPersistentPath -or $isDatabaseFile -or $isProtectedConfiguration) {
+                continue
+              }
+
+              $targetPath = Get-SafePath -Root $Root -RelativePath $relativePath
+              if (Test-Path -LiteralPath $targetPath -PathType Leaf) {
+                Remove-Item -LiteralPath $targetPath -Force
+              }
+            }
+          }
+
+          function Copy-Tree {
+            param(
+              [Parameter(Mandatory = $true)][string]$Source,
+              [Parameter(Mandatory = $true)][string]$Destination,
+              [string[]]$ExcludedFiles = @()
+            )
+
+            $robocopyArguments = @($Source, $Destination, '/E', '/R:2', '/W:2', '/NFL', '/NDL', '/NJH', '/NJS', '/NP')
+            if ($ExcludedFiles.Count -gt 0) {
+              $robocopyArguments += '/XF'
+              $robocopyArguments += $ExcludedFiles
+            }
+
+            & robocopy @robocopyArguments
+            $code = $LASTEXITCODE
+            if ($code -gt 7) {
+              throw "Copy from '$Source' to '$Destination' failed with ROBOCOPY code $code."
+            }
+          }
+
+          function Invoke-HealthCheck {
+            param(
+              [Parameter(Mandatory = $true)][string]$Uri,
+              [Parameter(Mandatory = $true)][string]$Name,
+              [switch]$ExpectJson
+            )
+
+            $lastError = 'No response received.'
+            for ($attempt = 1; $attempt -le 12; $attempt++) {
+              try {
+                $response = Invoke-WebRequest -Uri $Uri -UseBasicParsing -TimeoutSec 15
+                $status = [int]$response.StatusCode
+                $responsePath = $response.BaseResponse.ResponseUri.AbsolutePath
+
+                if ($status -eq 200 -and $responsePath -eq ([Uri]$Uri).AbsolutePath) {
+                  if ($ExpectJson) {
+                    $null = $response.Content | ConvertFrom-Json
+                  }
+
+                  Write-Host "$Name health check succeeded on attempt $attempt with HTTP $status at $responsePath."
+                  return
+                }
+
+                $lastError = "HTTP $status at $responsePath."
+              } catch {
+                $lastError = $_.Exception.Message
+              }
+
+              Write-Host "$Name health check attempt $attempt failed: $lastError"
+              if ($attempt -lt 12) {
+                Start-Sleep -Seconds 5
+              }
+            }
+
+            throw "$Name health check failed after 12 attempts. Last error: $lastError"
+          }
+
+          $webStage = Join-Path $env:DEPLOY_ROOT 'WEB'
+          $apiStage = Join-Path $env:DEPLOY_ROOT 'API'
+          $webBackup = Join-Path $env:DEPLOY_BACKUP 'WEB'
+          $apiBackup = Join-Path $env:DEPLOY_BACKUP 'API'
+          $webManifestName = '.fip-static-manifest.txt'
+          $apiManifestName = '.fip-api-manifest.txt'
+          $webManifest = Join-Path $env:FRONTEND_DEST $webManifestName
+          $webBackupManifest = Join-Path $webBackup $webManifestName
+          $apiManifest = Join-Path $env:API_DEST $apiManifestName
+          $apiBackupManifest = Join-Path $apiBackup $apiManifestName
+          # Deploy appsettings.json; preserve appsettings.Production.json and all other
+          # environment-specific configuration and secret files managed by the server.
+          $protectedApiPatterns = @('appsettings.*.json', 'secrets*.json', '.env*')
+
+          $newWebFiles = @(Get-RelativeFiles -Root $webStage)
+          $newApiFiles = @(Get-RelativeFiles -Root $apiStage -ExcludedFilePatterns $protectedApiPatterns)
+          $oldWebManagedFiles = if (Test-Path -LiteralPath $webManifest -PathType Leaf) {
+            @(Get-Content -LiteralPath $webManifest)
+          } else {
+            @()
+          }
+          $oldApiManagedFiles = if (Test-Path -LiteralPath $apiManifest -PathType Leaf) {
+            @(Get-Content -LiteralPath $apiManifest)
+          } else {
+            @()
+          }
+          $oldWebBackupFiles = @(Get-RelativeFiles -Root $webBackup)
+          $oldApiBackupFiles = @(Get-RelativeFiles -Root $apiBackup -ExcludedFilePatterns $protectedApiPatterns)
+          $deploymentError = $null
+
+          try {
+            New-Item -ItemType File -Path (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction Stop | Out-Null
+            Start-Sleep -Seconds 2
+
+            Remove-ManagedFilesNotInSet -Root $env:FRONTEND_DEST -CurrentFiles $oldWebManagedFiles -AllowedFiles $newWebFiles
+            Copy-Tree -Source $webStage -Destination $env:FRONTEND_DEST
+            $newWebFiles | Set-Content -LiteralPath $webManifest -Encoding utf8
+
+            Remove-ManagedFilesNotInSet -Root $env:API_DEST -CurrentFiles $oldApiManagedFiles -AllowedFiles $newApiFiles -ProtectedPatterns $protectedApiPatterns
+            Copy-Tree -Source $apiStage -Destination $env:API_DEST -ExcludedFiles @('appsettings.*.json', 'secrets*.json', '.env*')
+            $newApiFiles | Set-Content -LiteralPath $apiManifest -Encoding utf8
+
+            Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction SilentlyContinue
+
+            Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/' -Name 'Frontend'
+            Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/api/flights' -Name 'API' -ExpectJson
+          } catch {
+            $deploymentError = $_.Exception.ToString()
+            Write-Host "Deployment or verification failed; starting rollback: $deploymentError"
+
+            try {
+              New-Item -ItemType File -Path (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction Stop | Out-Null
+
+              Copy-Tree -Source $webBackup -Destination $env:FRONTEND_DEST
+              Remove-ManagedFilesNotInSet -Root $env:FRONTEND_DEST -CurrentFiles $newWebFiles -AllowedFiles $oldWebBackupFiles
+
+              Copy-Tree -Source $apiBackup -Destination $env:API_DEST -ExcludedFiles @('appsettings.*.json', 'secrets*.json', '.env*')
+              Remove-ManagedFilesNotInSet -Root $env:API_DEST -CurrentFiles $newApiFiles -AllowedFiles $oldApiBackupFiles -ProtectedPatterns $protectedApiPatterns
+
+              if (Test-Path -LiteralPath $webBackupManifest -PathType Leaf) {
+                Copy-Item -LiteralPath $webBackupManifest -Destination $webManifest -Force
+              } else {
+                Remove-Item -LiteralPath $webManifest -Force -ErrorAction SilentlyContinue
+              }
+
+              if (Test-Path -LiteralPath $apiBackupManifest -PathType Leaf) {
+                Copy-Item -LiteralPath $apiBackupManifest -Destination $apiManifest -Force -ErrorAction Stop
+              } else {
+                Remove-Item -LiteralPath $apiManifest -Force -ErrorAction SilentlyContinue
+              }
+
+              Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction Stop
+              Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/' -Name 'Frontend rollback'
+              Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/api/flights' -Name 'API rollback' -ExpectJson
+              Write-Host "Rollback completed and verification succeeded from $env:DEPLOY_BACKUP"
+            } catch {
+              $rollbackError = $_.Exception.ToString()
+              Write-Host "Rollback failed; the original deployment error was: $deploymentError"
+              throw "Deployment failed and rollback failed. Original deployment error: $deploymentError Rollback error: $rollbackError"
+            }
+
+            throw "Deployment failed, but rollback completed. Original deployment error: $deploymentError"
+          } finally {
+            Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Ensure app_offline.htm is removed
+        if: always()
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $offlinePath = Join-Path $env:API_DEST 'app_offline.htm'
+          if (Test-Path -LiteralPath $offlinePath) {
+            try {
+              Remove-Item -LiteralPath $offlinePath -Force
+              Write-Host 'Removed app_offline.htm during final recovery.'
+            } catch {
+              throw "Final app_offline.htm cleanup failed: $($_.Exception.Message)"
+            }
+          }
+
+      - name: Clean deployment staging
+        if: always()
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:DEPLOY_ROOT -and (Test-Path -LiteralPath $env:DEPLOY_ROOT)) {
+            Remove-Item -LiteralPath $env:DEPLOY_ROOT -Recurse -Force
+          }
