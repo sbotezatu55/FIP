@@ -1,6 +1,9 @@
 name: Deploy FIP demo
 
 on:
+  push:
+    branches:
+      - fip-demo
   workflow_dispatch:
 
 concurrency:
