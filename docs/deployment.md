@@ -6,7 +6,7 @@ build-master.yml runs on pushes to master and on manual dispatch using a GitHub-
 
 deploy-fip-demo.yml is manual-only. It always checks out the current fip-demo branch explicitly, regardless of the branch selected to open the workflow. It uses the self-hosted Windows runner labels self-hosted, Windows, X64, and fip-demo.
 
-The deployment builds both applications before it touches IIS. It publishes the API and stages the Angular output, validates the staged files, takes only the API child application offline, synchronizes managed frontend files without deleting unrelated persistent data, preserves API production configuration and persistent files, brings the API back online, and verifies the public frontend and API URLs.
+The deployment builds both applications before it touches IIS. It publishes the API and stages the Angular output, validates the staged files, takes only the API child application offline, stops only the `ATS.FIP.API` app pool until API files are copied, synchronizes managed frontend files without deleting unrelated persistent data, preserves API production configuration and persistent files, brings the API back online, and verifies the public frontend and API URLs.
 
 Database migrations are not run by the deployment workflow. Configure the production connection through IIS/server environment configuration or the existing server-managed production settings.
 
@@ -23,7 +23,7 @@ Database migrations are not run by the deployment workflow. Configure the produc
 
 The existing IIS site is expected to be:
 
-- Hostname: fip.aviatechsolutions.com
+- Hostname: fip.aviatechsystems.com
 - Parent site: ATS.FIP
 - Frontend directory: C:\inetpub\wwwroot\ATS.FIP\WEB
 - Frontend app pool: ATS.FIP
@@ -31,7 +31,7 @@ The existing IIS site is expected to be:
 - API directory: C:\inetpub\wwwroot\ATS.FIP\API
 - API app pool: ATS.FIP.API
 
-The workflow only deploys to the two configured directories. It does not recycle any IIS app pool. The API app_offline.htm mechanism is used to release application files during the copy.
+The workflow only deploys to the two configured directories. It stops and starts only the `ATS.FIP.API` app pool; unrelated IIS applications are not affected. The API `app_offline.htm` mechanism and the stopped app pool are used to release application files during the copy.
 
 The runner account must have read/execute access to the repository and write/modify access to both deployment directories and `C:\inetpub\backups\ATS.FIP`. It also needs permission to run dotnet, node, npm, and robocopy. Administrator rights are not required by the workflow itself, but IIS administrators may need to grant the runner service account filesystem permissions and ensure the API app pool can read the deployed files and production configuration.
 
@@ -70,9 +70,9 @@ The deployment workflow is intentionally not triggered by a push.
 
 After deployment, verify:
 
-- https://fip.aviatechsolutions.com/ returns the Angular application.
-- Refreshing https://fip.aviatechsolutions.com/flights/123 returns the Angular application instead of a 404.
-- https://fip.aviatechsolutions.com/api/flights returns an HTTP 200 response.
+- https://fip.aviatechsystems.com/ returns the Angular application.
+- Refreshing https://fip.aviatechsystems.com/flights/123 returns the Angular application instead of a 404.
+- https://fip.aviatechsystems.com/api/flights returns an HTTP 200 response.
 - Browser developer tools show frontend calls to /api/..., not /api/api/....
 - The API child application remains mapped to /API and its generated ASP.NET Core web.config remains in C:\inetpub\wwwroot\ATS.FIP\API.
 
@@ -83,7 +83,7 @@ Before modifying IIS content, the workflow creates a timestamped file backup at:
 - `C:\inetpub\backups\ATS.FIP\<yyyyMMdd-HHmmss>-<run-id>\WEB`
 - `C:\inetpub\backups\ATS.FIP\<yyyyMMdd-HHmmss>-<run-id>\API`
 
-If deployment or either post-deployment health check fails, the workflow automatically restores the backed-up WEB and API files. It reports the original deployment error separately from any rollback error. The API remains offline during recovery and `app_offline.htm` is removed after recovery or successful deployment. A final cleanup step also attempts to remove it if an earlier step fails.
+If deployment or either post-deployment health check fails, the workflow automatically restores the backed-up WEB and API files. It reports copy failures separately from health-check failures and reports rollback failures separately from the original deployment failure. The API app pool is stopped during recovery and restarted before rollback verification; a final recovery path also attempts to restart it and remove `app_offline.htm` if an earlier step fails.
 
 The frontend rollback restores the previous static-file manifest. The frontend deployment only removes files previously recorded by that manifest, so unrelated persistent files are not treated as obsolete. API production configuration files matching `appsettings*.json`, uploaded files, and other files not removed by the workflow are preserved.
 
@@ -97,4 +97,4 @@ For a manual rollback, identify a known-good `fip-demo` commit and run `deploy-f
 - Angular route refresh returns 404: verify IIS URL Rewrite is installed and the deployed frontend web.config exists in the WEB directory.
 - /api is handled by Angular: verify the API child application alias is exactly API and that the frontend web.config API rewrite rule appears before the SPA fallback rule.
 - API returns 500: verify the API app pool identity can read the production configuration and connect to SQL Server. The workflow does not run migrations or print connection strings.
-- Copy fails with access denied: grant the runner service account Modify permission on the WEB and API directories and ensure the API app pool can be taken offline through app_offline.htm.
+- Copy fails with access denied or ERROR 32: grant the runner service account Modify permission on the WEB and API directories, ensure the API app pool can be taken offline through `app_offline.htm`, and inspect the workflow diagnostics for separate staging-source and IIS-destination lock checks.

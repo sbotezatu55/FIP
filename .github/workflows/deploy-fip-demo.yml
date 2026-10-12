@@ -315,6 +315,111 @@ jobs:
             $global:LASTEXITCODE = 0
           }
 
+          function Stop-ApiApplicationPool {
+            Import-Module WebAdministration -ErrorAction Stop
+            $appPoolName = 'ATS.FIP.API'
+            $appPoolPath = "IIS:\AppPools\$appPoolName"
+
+            if (-not (Test-Path -LiteralPath $appPoolPath)) {
+              throw "Required IIS application pool does not exist: $appPoolName"
+            }
+
+            $state = (Get-WebAppPoolState -Name $appPoolName).Value
+            if ($state -ne 'Stopped') {
+              Write-Host "Stopping IIS application pool $appPoolName before deployment file copies. Current state: $state"
+              Stop-WebAppPool -Name $appPoolName
+            }
+
+            for ($attempt = 1; $attempt -le 30; $attempt++) {
+              $state = (Get-WebAppPoolState -Name $appPoolName).Value
+              if ($state -eq 'Stopped') {
+                Write-Host "IIS application pool $appPoolName is fully stopped."
+                return
+              }
+
+              Start-Sleep -Seconds 1
+            }
+
+            throw "IIS application pool $appPoolName did not reach the Stopped state. Last state: $state"
+          }
+
+          function Start-ApiApplicationPool {
+            Import-Module WebAdministration -ErrorAction Stop
+            $appPoolName = 'ATS.FIP.API'
+            $appPoolPath = "IIS:\AppPools\$appPoolName"
+
+            if (-not (Test-Path -LiteralPath $appPoolPath)) {
+              throw "Required IIS application pool does not exist: $appPoolName"
+            }
+
+            $state = (Get-WebAppPoolState -Name $appPoolName).Value
+            if ($state -ne 'Started') {
+              Write-Host "Starting IIS application pool $appPoolName. Current state: $state"
+              Start-WebAppPool -Name $appPoolName
+            }
+
+            for ($attempt = 1; $attempt -le 30; $attempt++) {
+              $state = (Get-WebAppPoolState -Name $appPoolName).Value
+              if ($state -eq 'Started') {
+                Write-Host "IIS application pool $appPoolName is started."
+                return
+              }
+
+              Start-Sleep -Seconds 1
+            }
+
+            throw "IIS application pool $appPoolName did not reach the Started state. Last state: $state"
+          }
+
+          function Get-FileAccessDiagnostic {
+            param(
+              [Parameter(Mandatory = $true)][string]$Path,
+              [Parameter(Mandatory = $true)][string]$Role
+            )
+
+            if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+              return "$Role file '$Path' does not exist."
+            }
+
+            try {
+              $stream = [IO.File]::Open(
+                $Path,
+                [IO.FileMode]::Open,
+                [IO.FileAccess]::ReadWrite,
+                [IO.FileShare]::None
+              )
+              $stream.Dispose()
+              return "$Role file '$Path' can be opened exclusively; no restrictive file lock was detected."
+            } catch {
+              return "$Role file '$Path' could not be opened exclusively; a lock or access issue may be present: $($_.Exception.Message)"
+            }
+          }
+
+          function Write-ApiDllCopyDiagnostics {
+            param([Parameter(Mandatory = $true)][string]$ApiStageRoot)
+
+            $apiDllName = 'Fip.Api.dll'
+            $stagingApiDll = Join-Path $ApiStageRoot $apiDllName
+            $destinationApiDll = Join-Path $env:API_DEST $apiDllName
+
+            Write-Host (Get-FileAccessDiagnostic -Path $stagingApiDll -Role 'Staging API')
+            Write-Host (Get-FileAccessDiagnostic -Path $destinationApiDll -Role 'IIS destination API')
+          }
+
+          function Get-FailureKind {
+            param([Parameter(Mandatory = $true)][string]$Phase)
+
+            if ($Phase -like '*health check*') {
+              return 'Health-check'
+            }
+
+            if ($Phase -like '*copy*' -or $Phase -like '*manifest*') {
+              return 'Copy'
+            }
+
+            return 'Deployment'
+          }
+
           function Invoke-HealthCheck {
             param(
               [Parameter(Mandatory = $true)][string]$Uri,
@@ -381,33 +486,61 @@ jobs:
           $oldWebBackupFiles = @(Get-RelativeFiles -Root $webBackup)
           $oldApiBackupFiles = @(Get-RelativeFiles -Root $apiBackup -ExcludedFilePatterns $protectedApiPatterns)
           $deploymentError = $null
+          $deploymentPhase = 'Not started'
+          $deploymentFailureKind = 'Deployment'
 
           try {
+            $deploymentPhase = 'Taking API offline'
             New-Item -ItemType File -Path (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction Stop | Out-Null
+
+            $deploymentPhase = 'Stopping API application pool'
+            Stop-ApiApplicationPool
             Start-Sleep -Seconds 2
 
+            $deploymentPhase = 'Copying WEB files'
             Remove-ManagedFilesNotInSet -Root $env:FRONTEND_DEST -CurrentFiles $oldWebManagedFiles -AllowedFiles $newWebFiles
             Copy-Tree -Source $webStage -Destination $env:FRONTEND_DEST
             $newWebFiles | Set-Content -LiteralPath $webManifest -Encoding utf8
 
+            $deploymentPhase = 'Copying API files'
             Remove-ManagedFilesNotInSet -Root $env:API_DEST -CurrentFiles $oldApiManagedFiles -AllowedFiles $newApiFiles -ProtectedPatterns $protectedApiPatterns
             Copy-Tree -Source $apiStage -Destination $env:API_DEST -ExcludedFiles @('appsettings.*.json', 'secrets*.json', '.env*')
             $newApiFiles | Set-Content -LiteralPath $apiManifest -Encoding utf8
 
+            $deploymentPhase = 'Starting API application pool'
+            Start-ApiApplicationPool
+
+            $deploymentPhase = 'Removing API offline marker'
             Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction SilentlyContinue
 
+            $deploymentPhase = 'Frontend health check'
             Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/' -Name 'Frontend'
+
+            $deploymentPhase = 'API health check'
             Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/api/flights' -Name 'API' -ExpectJson
           } catch {
             $deploymentError = $_.Exception.ToString()
-            Write-Host "Deployment or verification failed; starting rollback: $deploymentError"
+            $deploymentFailureKind = Get-FailureKind -Phase $deploymentPhase
+            if ($deploymentPhase -eq 'Copying API files') {
+              Write-ApiDllCopyDiagnostics -ApiStageRoot $apiStage
+            }
+            Write-Host "$deploymentFailureKind failure during deployment phase '$deploymentPhase'; starting rollback: $deploymentError"
 
+            $rollbackPhase = 'Not started'
+            $rollbackFailureKind = 'Deployment'
             try {
+              $rollbackPhase = 'Taking API offline'
               New-Item -ItemType File -Path (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction Stop | Out-Null
 
+              $rollbackPhase = 'Stopping API application pool'
+              Stop-ApiApplicationPool
+              Start-Sleep -Seconds 2
+
+              $rollbackPhase = 'Copying WEB backup'
               Copy-Tree -Source $webBackup -Destination $env:FRONTEND_DEST
               Remove-ManagedFilesNotInSet -Root $env:FRONTEND_DEST -CurrentFiles $newWebFiles -AllowedFiles $oldWebBackupFiles
 
+              $rollbackPhase = 'Copying API backup'
               Copy-Tree -Source $apiBackup -Destination $env:API_DEST -ExcludedFiles @('appsettings.*.json', 'secrets*.json', '.env*')
               Remove-ManagedFilesNotInSet -Root $env:API_DEST -CurrentFiles $newApiFiles -AllowedFiles $oldApiBackupFiles -ProtectedPatterns $protectedApiPatterns
 
@@ -423,19 +556,42 @@ jobs:
                 Remove-Item -LiteralPath $apiManifest -Force -ErrorAction SilentlyContinue
               }
 
+              $rollbackPhase = 'Starting API application pool'
+              Start-ApiApplicationPool
+
+              $rollbackPhase = 'Removing API offline marker'
               Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction Stop
+
+              $rollbackPhase = 'Frontend rollback health check'
               Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/' -Name 'Frontend rollback'
+
+              $rollbackPhase = 'API rollback health check'
               Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/api/flights' -Name 'API rollback' -ExpectJson
               Write-Host "Rollback completed and verification succeeded from $env:DEPLOY_BACKUP"
             } catch {
               $rollbackError = $_.Exception.ToString()
-              Write-Host "Rollback failed; the original deployment error was: $deploymentError"
-              throw "Deployment failed and rollback failed. Original deployment error: $deploymentError Rollback error: $rollbackError"
+              $rollbackFailureKind = Get-FailureKind -Phase $rollbackPhase
+              if ($rollbackPhase -eq 'Copying API backup') {
+                Write-ApiDllCopyDiagnostics -ApiStageRoot $apiBackup
+              }
+              Write-Host "$rollbackFailureKind failure during rollback phase '$rollbackPhase'; the original deployment error was: $deploymentError"
+              throw "Deployment failed during $deploymentFailureKind phase '$deploymentPhase' and rollback failed during $rollbackFailureKind phase '$rollbackPhase'. Original deployment error: $deploymentError Rollback error: $rollbackError"
             }
 
-            throw "Deployment failed, but rollback completed. Original deployment error: $deploymentError"
+            throw "Deployment failed during $deploymentFailureKind phase '$deploymentPhase', but rollback completed. Original deployment error: $deploymentError"
           } finally {
+            $restartError = $null
+            try {
+              Start-ApiApplicationPool
+            } catch {
+              $restartError = $_.Exception.ToString()
+              Write-Host "API application pool restart failed during final recovery: $restartError"
+            }
+
             Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction SilentlyContinue
+            if ($restartError) {
+              throw "API application pool could not be restarted during final recovery: $restartError"
+            }
           }
 
       - name: Ensure app_offline.htm is removed
