@@ -396,8 +396,8 @@ jobs:
 
             Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction SilentlyContinue
 
-            Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/' -Name 'Frontend'
-            Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/api/flights' -Name 'API' -ExpectJson
+            Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/' -Name 'Frontend'
+            Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/api/flights' -Name 'API' -ExpectJson
           } catch {
             $deploymentError = $_.Exception.ToString()
             Write-Host "Deployment or verification failed; starting rollback: $deploymentError"
@@ -424,8 +424,8 @@ jobs:
               }
 
               Remove-Item -LiteralPath (Join-Path $env:API_DEST 'app_offline.htm') -Force -ErrorAction Stop
-              Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/' -Name 'Frontend rollback'
-              Invoke-HealthCheck -Uri 'https://fip.aviatechsolutions.com/api/flights' -Name 'API rollback' -ExpectJson
+              Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/' -Name 'Frontend rollback'
+              Invoke-HealthCheck -Uri 'https://fip.aviatechsystems.com/api/flights' -Name 'API rollback' -ExpectJson
               Write-Host "Rollback completed and verification succeeded from $env:DEPLOY_BACKUP"
             } catch {
               $rollbackError = $_.Exception.ToString()
