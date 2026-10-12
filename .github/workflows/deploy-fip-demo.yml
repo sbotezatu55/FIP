@@ -170,12 +170,14 @@ jobs:
             if ($webCode -gt 7) {
               throw "WEB backup failed with ROBOCOPY code $webCode."
             }
+            $global:LASTEXITCODE = 0
 
             robocopy $env:API_DEST $apiBackup /E /COPY:DAT /DCOPY:DAT /R:2 /W:2 /NFL /NDL /NJH /NJS /NP
             $apiCode = $LASTEXITCODE
             if ($apiCode -gt 7) {
               throw "API backup failed with ROBOCOPY code $apiCode."
             }
+            $global:LASTEXITCODE = 0
 
             if (-not (Test-Path -LiteralPath $webBackup -PathType Container) -or
                 -not (Test-Path -LiteralPath $apiBackup -PathType Container)) {
@@ -187,6 +189,8 @@ jobs:
           } catch {
             throw "Backup failed before IIS was modified. $($_.Exception.Message)"
           }
+
+          exit 0
 
       - name: Deploy, verify, and roll back on failure
         shell: powershell
@@ -308,6 +312,7 @@ jobs:
             if ($code -gt 7) {
               throw "Copy from '$Source' to '$Destination' failed with ROBOCOPY code $code."
             }
+            $global:LASTEXITCODE = 0
           }
 
           function Invoke-HealthCheck {
