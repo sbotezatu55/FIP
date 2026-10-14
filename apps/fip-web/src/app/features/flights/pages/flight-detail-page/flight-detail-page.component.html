@@ -90,7 +90,7 @@
           <h2 id="delete-title">Remove this flight</h2>
           <p>Delete this flight and all of its stored telemetry and analysis.</p>
         </div>
-        <button class="fip-button delete-flight-button" type="button" (click)="requestDelete()">
+        <button class="fip-button delete-flight-button" type="button" (click)="requestDelete()" aria-disabled="true" disabled>
           <app-fip-icon class="delete-icon" name="delete" [size]="18" /> Delete Flight
         </button>
       </section>
